@@ -9,10 +9,16 @@ import { Gifts } from './model/gifts.model';
 import { Items } from './model/items.model';
 import { Stages } from './model/stages.model';
 import { Users } from './model/users.model';
+import { MongooseModule } from '@nestjs/mongoose';
+import { LogsModule } from './logs/logs.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    MongooseModule.forRoot(process.env.MONGO_DB, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: process.env.MYSQL_HOST,
@@ -23,6 +29,7 @@ import { Users } from './model/users.model';
       entities: [Companies, GameRecords, Gifts, Items, Stages, Users],
       synchronize: JSON.parse(process.env.MYSQL_SYNC),
     }),
+    LogsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
