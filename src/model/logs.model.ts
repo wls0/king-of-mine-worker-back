@@ -38,6 +38,11 @@ export class Logs extends Document {
   })
   user: string;
 
+  @Prop({
+    required: true,
+  })
+  date: string;
+
   @Prop({ default: Date.now() + expire })
   expireAt: Date;
 }
