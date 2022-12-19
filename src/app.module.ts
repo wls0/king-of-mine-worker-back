@@ -11,6 +11,7 @@ import { Stages } from './model/stages.model';
 import { Users } from './model/users.model';
 import { MongooseModule } from '@nestjs/mongoose';
 import { LogsModule } from './logs/logs.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { LogsModule } from './logs/logs.module';
       synchronize: JSON.parse(process.env.MYSQL_SYNC),
     }),
     LogsModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
