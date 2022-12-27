@@ -1,13 +1,13 @@
 import { createHmac } from 'crypto';
 
 export const passwordMaker = (
-  pwd: number,
-): { password: string; salt: string } => {
+  pwd: string,
+): { makePassword: string; salt: string } => {
   const salt = String(Math.round(new Date().valueOf() + Math.random()));
   const password: string = createHmac('sha512', process.env.CRYPTO)
     .update(pwd + salt)
     .digest('hex');
-  return { password, salt };
+  return { makePassword: password, salt };
 };
 
 export const passwordDecoding = (pwd: { password: string; salt: string }) => {
