@@ -1,9 +1,5 @@
 import { IsIn } from 'class-validator';
-import {
-  IsNotEmpty,
-  IsString,
-  Matches,
-} from 'class-validator/types/decorator/decorators';
+import { IsNotEmpty, IsString, Matches } from 'class-validator';
 
 export class FindLogDto {
   @IsIn(['account', 'stage', 'item', 'company'])
