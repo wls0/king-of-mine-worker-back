@@ -26,7 +26,7 @@ export class LogRepository {
 
     if (savedLog) {
       await this.logModel.findOneAndUpdate(
-        { _id: user },
+        { _id: savedLog._id },
         { $push: { [`${type}Log`]: log } },
       );
     } else {
