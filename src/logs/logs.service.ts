@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import dayjs from 'dayjs';
-import { jwtPayload } from '../users/jwt/jwt.payload';
 import { FindLogDto, SaveLogDto } from './dto/logs.dto';
 import { LogRepository } from './logs.repository';
 
@@ -23,12 +22,10 @@ export class LogsService {
       .toDate();
 
     const log = await this.logRepository.findLog({ type, start, end });
-
     return log;
   }
 
-  async saveLog(user: jwtPayload, data: SaveLogDto) {
-    const { userIndex } = user;
-    await this.logRepository.saveLog(userIndex, data);
+  async saveLog(user: string, data: SaveLogDto) {
+    await this.logRepository.saveLog(user, data);
   }
 }

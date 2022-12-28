@@ -22,6 +22,8 @@ export class LogRepository {
     const now = new Date();
     const date = dayjs(now).format('YYYY-MM-DD');
     const savedLog = await this.logModel.findOne({ user, date });
+    log.time = new Date();
+
     if (savedLog) {
       await this.logModel.findOneAndUpdate(
         { _id: user },
