@@ -21,4 +21,6 @@ export class SaveLogDto {
   @IsIn(['account', 'stage', 'item', 'company'])
   @IsNotEmpty()
   type: 'account' | 'stage' | 'item' | 'company';
+
+  log: any;
 }

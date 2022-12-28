@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import dayjs from 'dayjs';
 import { Model } from 'mongoose';
 import { Logs } from '../model/logs.model';
+import { SaveLogDto } from './dto/logs.dto';
 
 @Injectable()
 export class LogRepository {
@@ -16,19 +17,18 @@ export class LogRepository {
       .lte('createdAt', end);
   }
 
-  async saveLog(id, data: { type: string; log }) {
-    const { user } = id;
+  async saveLog(user: string, data: SaveLogDto) {
     const { type, log } = data;
     const now = new Date();
     const date = dayjs(now).format('YYYY-MM-DD');
     const savedLog = await this.logModel.findOne({ user, date });
     if (savedLog) {
-      return await this.logModel.findOneAndUpdate(
+      await this.logModel.findOneAndUpdate(
         { _id: user },
         { $push: { [`${type}Log`]: log } },
       );
     } else {
-      return await this.logModel.create({ user, date, [`${type}Log`]: [log] });
+      await this.logModel.create({ user, date, [`${type}Log`]: [log] });
     }
   }
 }
