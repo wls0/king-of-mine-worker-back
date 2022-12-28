@@ -1,20 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Model } from 'mongoose';
-import { Logs } from '../model/logs.model';
 import { Users } from '../model/users.model';
-import { Stages } from '../model/stages.model';
 import { Items } from '../model/items.model';
-import { Gifts } from '../model/gifts.model';
 import { GameRecords } from '../model/game-records.mode';
+
 @Injectable()
 export class UsersRepository {
   constructor(
-    @InjectModel(Logs.name) private readonly logsModel: Model<Logs>,
     @InjectRepository(Users) private userRepository: Repository<Users>,
-    @InjectRepository(Stages) private stagesRepository: Repository<Stages>,
     @InjectRepository(Items) private itemsRepository: Repository<Items>,
     @InjectRepository(GameRecords)
     private gameRecordsRepository: Repository<GameRecords>,
@@ -37,11 +31,6 @@ export class UsersRepository {
       .execute();
     const userIndex = createUser.identifiers[0].userIndex;
     await Promise.all([
-      this.stagesRepository
-        .createQueryBuilder('stages')
-        .insert()
-        .values({ user: userIndex })
-        .execute(),
       this.itemsRepository
         .createQueryBuilder('itmes')
         .insert()
@@ -53,6 +42,8 @@ export class UsersRepository {
         .values({ user: userIndex })
         .execute(),
     ]);
+
+    return userIndex;
   }
 
   async getUserLoginInfo(id: string) {

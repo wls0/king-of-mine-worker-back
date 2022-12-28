@@ -8,12 +8,14 @@ import { JwtService } from '@nestjs/jwt';
 import { UserMainDto, NickNameDto, UserIdDto } from './dto/users.dto';
 import { UsersRepository } from './users.repository';
 import { passwordMaker, passwordDecoding } from './utils/util';
-
+import { LogsService } from '../logs/logs.service';
+import { SaveLogDto } from '../logs/dto/logs.dto';
 @Injectable()
 export class UsersService {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly jwtService: JwtService,
+    private readonly logService: LogsService,
   ) {}
   async findId(param: UserIdDto) {
     const { id } = param;
@@ -29,7 +31,16 @@ export class UsersService {
     const { id, password } = body;
     await this.findId({ id });
     const { makePassword, salt } = passwordMaker(password);
-    await this.usersRepository.createUser({ id, password: makePassword, salt });
+    const userIndex = await this.usersRepository.createUser({
+      id,
+      password: makePassword,
+      salt,
+    });
+    const saveLog: SaveLogDto = {
+      type: 'account',
+      log: { title: 'createAccount' },
+    };
+    await this.logService.saveLog(userIndex, saveLog);
     return '';
   }
 
@@ -50,6 +61,11 @@ export class UsersService {
           },
           { secret: process.env.JWT },
         );
+        const saveLog: SaveLogDto = {
+          type: 'account',
+          log: { title: 'login' },
+        };
+        await this.logService.saveLog(user.userIndex, saveLog);
         return token;
       } else {
         throw new UnauthorizedException();
