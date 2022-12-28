@@ -1,20 +1,9 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  JoinColumn,
-  OneToOne,
-} from 'typeorm';
-import { Users } from './users.model';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Stages {
   @PrimaryGeneratedColumn()
   stage: number;
-
-  @OneToOne(() => Users)
-  @JoinColumn({ name: 'user' })
-  user: Users;
 
   @Column({ type: 'int', default: 0 })
   coal: number;

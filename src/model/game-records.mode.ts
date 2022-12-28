@@ -12,7 +12,7 @@ export class GameRecords {
   @PrimaryGeneratedColumn('uuid')
   index: string;
 
-  @OneToOne(() => Users)
+  @OneToOne(() => Users, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user' })
   user: Users;
 
