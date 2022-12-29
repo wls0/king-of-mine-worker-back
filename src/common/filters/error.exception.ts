@@ -13,6 +13,9 @@ export class ErrorExceptionFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
     const status =
       exception instanceof HttpException ? exception.getStatus() : 500;
+    if (process.env.NODE_ENV === 'dev') {
+      console.log('Error : ' + exception);
+    }
     const error =
       exception instanceof HttpException
         ? (exception.getResponse() as
