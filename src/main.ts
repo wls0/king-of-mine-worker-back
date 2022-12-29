@@ -22,6 +22,7 @@ async function bootstrap() {
   }
 
   const config = new DocumentBuilder()
+    .addBearerAuth()
     .setTitle('광부왕')
     .setDescription('king-of-mine-worker-back Api')
     .setVersion(process.env.VERSION)

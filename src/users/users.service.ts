@@ -10,6 +10,7 @@ import { UsersRepository } from './users.repository';
 import { passwordMaker, passwordDecoding } from './utils/util';
 import { LogsService } from '../logs/logs.service';
 import { SaveLogDto } from '../logs/dto/logs.dto';
+import { jwtPayload } from './jwt/jwt.payload';
 @Injectable()
 export class UsersService {
   constructor(
@@ -75,7 +76,21 @@ export class UsersService {
     }
   }
 
-  async findNickname(param: NickNameDto) {}
+  async findNickname(param: NickNameDto) {
+    const { nickname } = param;
+    const existCheck = await this.usersRepository.findNickname(nickname);
+    if (existCheck) {
+      throw new ConflictException();
+    } else {
+      return '';
+    }
+  }
 
-  async changeNickname(body: NickNameDto) {}
+  async changeNickname(user: jwtPayload, body: NickNameDto) {
+    const { nickname } = body;
+    const { userIndex } = user;
+    await this.findNickname(body);
+    await this.usersRepository.updateNickname(userIndex, nickname);
+    return '';
+  }
 }

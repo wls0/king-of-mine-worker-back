@@ -8,6 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { Items } from '../model/items.model';
 import { GameRecords } from '../model/game-records.mode';
 import { LogsModule } from '../logs/logs.module';
+import { JwtStrategy } from './jwt/jwt.strategy';
 
 @Module({
   imports: [
@@ -19,6 +20,6 @@ import { LogsModule } from '../logs/logs.module';
     LogsModule,
   ],
   controllers: [UsersController],
-  providers: [UsersService, UsersRepository],
+  providers: [UsersService, UsersRepository, JwtStrategy],
 })
 export class UsersModule {}

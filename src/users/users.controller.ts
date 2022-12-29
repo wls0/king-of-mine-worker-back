@@ -1,6 +1,10 @@
 import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { UseGuards } from '@nestjs/common/decorators';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CurrentUser } from '../common/decorators/user.decorators';
 import { UserMainDto, NickNameDto, UserIdDto } from './dto/users.dto';
+import { JwtAuthGuard } from './jwt/jwt.guard';
+import { jwtPayload } from './jwt/jwt.payload';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -26,13 +30,20 @@ export class UsersController {
     return await this.usersService.login(body);
   }
 
-  @Get('nickname/:id')
-  async findNickname(param: NickNameDto) {
-    await this.usersService.findNickname(param);
+  @Get('nickname/:nickname')
+  @ApiOperation({ summary: '닉네임 확인' })
+  async findNickname(@Param() param: NickNameDto) {
+    return await this.usersService.findNickname(param);
   }
 
+  @ApiOperation({ summary: '닉네임 변경' })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Patch('nickname')
-  async changeNickname(body: NickNameDto) {
-    await this.usersService.changeNickname(body);
+  async changeNickname(
+    @CurrentUser() user: jwtPayload,
+    @Body() body: NickNameDto,
+  ) {
+    return await this.usersService.changeNickname(user, body);
   }
 }

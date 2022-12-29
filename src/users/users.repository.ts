@@ -49,8 +49,30 @@ export class UsersRepository {
   async getUserLoginInfo(id: string) {
     return await this.userRepository
       .createQueryBuilder('users')
-      .select(['users.userIndex', 'users.password', 'users.salt'])
+      .select([
+        'users.userIndex',
+        'users.password',
+        'users.salt',
+        'users.status',
+        'users.accessLevel',
+      ])
       .where('users.id = :id', { id })
       .getOne();
+  }
+
+  async findNickname(nickname: string) {
+    return await this.userRepository
+      .createQueryBuilder('users')
+      .where('users.nickname = :nickname', { nickname })
+      .getExists();
+  }
+
+  async updateNickname(userIndex: string, nickname: string) {
+    await this.userRepository
+      .createQueryBuilder('users')
+      .update()
+      .set({ nickname })
+      .where('users.userIndex = userIndex', { userIndex })
+      .execute();
   }
 }
