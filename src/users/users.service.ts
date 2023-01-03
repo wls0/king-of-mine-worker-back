@@ -1,7 +1,6 @@
 import {
   ConflictException,
   Injectable,
-  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -72,7 +71,7 @@ export class UsersService {
         throw new UnauthorizedException();
       }
     } else {
-      throw new NotFoundException();
+      throw new UnauthorizedException();
     }
   }
 
