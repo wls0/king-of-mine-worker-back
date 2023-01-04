@@ -12,6 +12,8 @@ import { Users } from './model/users.model';
 import { MongooseModule } from '@nestjs/mongoose';
 import { LogsModule } from './logs/logs.module';
 import { UsersModule } from './users/users.module';
+import { GamesModule } from './games/games.module';
+import { CommunitiesModule } from './communities/communities.module';
 
 @Module({
   imports: [
@@ -32,6 +34,8 @@ import { UsersModule } from './users/users.module';
     }),
     LogsModule,
     UsersModule,
+    GamesModule,
+    CommunitiesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
