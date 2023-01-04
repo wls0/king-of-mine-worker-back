@@ -14,6 +14,7 @@ import { LogsModule } from './logs/logs.module';
 import { UsersModule } from './users/users.module';
 import { GamesModule } from './games/games.module';
 import { CommunitiesModule } from './communities/communities.module';
+import { CompaniesModule } from './companies/companies.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { CommunitiesModule } from './communities/communities.module';
     UsersModule,
     GamesModule,
     CommunitiesModule,
+    CompaniesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
