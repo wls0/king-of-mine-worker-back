@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { Get, Param } from '@nestjs/common/decorators';
+import { Get, Param } from '@nestjs/common';
 import { FindLogDto } from './dto/logs.dto';
 import { LogsService } from './logs.service';
 @Controller('logs')

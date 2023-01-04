@@ -1,5 +1,12 @@
-import { Controller, Get, Param } from '@nestjs/common';
-import { Body, Delete, Patch, Post } from '@nestjs/common/decorators';
+import {
+  Controller,
+  Get,
+  Param,
+  Body,
+  Delete,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 @Controller('communities')
