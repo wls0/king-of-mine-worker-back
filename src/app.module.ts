@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Companies } from './model/companies.model';
+import { CompanyUsers } from './model/company-users.model';
 import { GameRecords } from './model/game-records.mode';
 import { Gifts } from './model/gifts.model';
 import { Items } from './model/items.model';
@@ -30,7 +31,15 @@ import { CompaniesModule } from './companies/companies.module';
       username: process.env.MYSQL_USERNAME,
       password: process.env.MYSQL_PASSWORD,
       database: process.env.MYSQL_DB,
-      entities: [Companies, GameRecords, Gifts, Items, Stages, Users],
+      entities: [
+        Companies,
+        GameRecords,
+        Gifts,
+        Items,
+        Stages,
+        Users,
+        CompanyUsers,
+      ],
       synchronize: JSON.parse(process.env.MYSQL_SYNC),
     }),
     LogsModule,

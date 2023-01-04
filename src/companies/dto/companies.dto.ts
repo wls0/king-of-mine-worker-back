@@ -1,6 +1,7 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { Companies } from '../../model/companies.model';
+import { CompanyUsers } from '../../model/company-users.model';
 
 export class CompanyNameDto extends PickType(Companies, [
   'companyName',
@@ -27,8 +28,8 @@ export class UserIndexDto {
   userIndex: string;
 }
 
-export class CompanyPromoteDto extends PickType(Companies, [
-  'companyName',
+export class CompanyPromoteDto extends PickType(CompanyUsers, [
+  'companyIndex',
   'position',
 ] as const) {
   @ApiProperty({
