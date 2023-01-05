@@ -18,7 +18,7 @@ export class CompanyUsers {
 
   @OneToOne(() => Users, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user' })
-  user: Users;
+  user: string;
 
   @ApiProperty({
     example: 'dfgkjsldjrijgalmvlskmfg',

@@ -1,12 +1,6 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  OneToOne,
-  JoinColumn,
-} from 'typeorm';
-import { Users } from './users.model';
-import { IsIn, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+
+import { IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
