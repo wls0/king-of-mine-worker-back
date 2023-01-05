@@ -28,16 +28,15 @@ export class UserIndexDto {
   userIndex: string;
 }
 
-export class CompanyPromoteDto extends PickType(CompanyUsers, [
-  'companyIndex',
+export class promoteCompanyDto extends PickType(CompanyUsers, [
   'position',
 ] as const) {
   @ApiProperty({
     example: 'shjfsldflkjjuserIndex',
-    description: 'userIndex',
+    description: 'staffIndex',
     required: true,
   })
   @IsString()
   @IsNotEmpty()
-  userIndex: string;
+  staffIndex: string;
 }

@@ -15,7 +15,7 @@ import { JwtAuthGuard } from '../users/jwt/jwt.guard';
 import {
   CompanyNameDto,
   CompanyCreateDto,
-  CompanyPromoteDto,
+  promoteCompanyDto,
   UserIndexDto,
 } from './dto/companies.dto';
 import { CompaniesService } from './companies.service';
@@ -43,27 +43,27 @@ export class CompaniesController {
 
   @Get('list')
   @ApiOperation({ summary: '전체 회사 목록 확인' })
-  async companyList() {
-    await this.companiesService.companyList();
+  async findCompanyList() {
+    await this.companiesService.findCompanyList();
   }
 
   @Get('staff/list')
   @ApiOperation({ summary: '소속 회사 인원 확인' })
-  async companyStaffList(@CurrentUser() user: jwtPayload) {
-    await this.companiesService.companyStaffList(user);
+  async findCompanyStaffList(@CurrentUser() user: jwtPayload) {
+    await this.companiesService.findCompanyStaffList(user);
   }
 
   @Delete('leave')
   @ApiOperation({
-    summary: '회사 탈퇴',
+    summary: '회사 탈퇴 or 가입 취소',
     description: '사장은 탈퇴 불가',
   })
-  async companyLeave(@CurrentUser() user: jwtPayload) {
-    await this.companiesService.companyLeave(user);
+  async leaveCompany(@CurrentUser() user: jwtPayload) {
+    await this.companiesService.leaveCompany(user);
   }
 
   @Post('')
-  @ApiOperation({ summary: '회사 생성', description: '사장 등급만 사용 가능' })
+  @ApiOperation({ summary: '회사 생성' })
   async createCompany(
     @CurrentUser() user: jwtPayload,
     @Body() body: CompanyCreateDto,
@@ -91,11 +91,11 @@ export class CompaniesController {
     summary: '직위 변경',
     description: '사장 등급만 사용 가능, 사장으로 변경 시 직위 교체',
   })
-  async companyPromote(
+  async promoteCompany(
     @CurrentUser() user: jwtPayload,
-    @Body() body: CompanyPromoteDto,
+    @Body() body: promoteCompanyDto,
   ) {
-    await this.companiesService.companyPromote(user, body);
+    await this.companiesService.promoteCompany(user, body);
   }
 
   @Delete('staff/:userIndex')
