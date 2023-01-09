@@ -5,7 +5,7 @@ import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LogsService } from '../../logs/logs.service';
 import { passwordMaker } from '../utils/util';
-import { jwtPayload } from '../jwt/jwt.payload';
+import { jwtPayload } from '../../auth/jwt.payload';
 jest.mock('../users.repository.ts');
 jest.mock('../../logs/logs.service');
 

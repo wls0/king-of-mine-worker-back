@@ -9,7 +9,7 @@ import { UsersRepository } from './users.repository';
 import { passwordMaker, passwordDecoding } from './utils/util';
 import { LogsService } from '../logs/logs.service';
 import { SaveLogDto } from '../logs/dto/logs.dto';
-import { jwtPayload } from './jwt/jwt.payload';
+import { jwtPayload } from '../auth/jwt.payload';
 @Injectable()
 export class UsersService {
   constructor(

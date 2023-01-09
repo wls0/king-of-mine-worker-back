@@ -16,6 +16,7 @@ import { UsersModule } from './users/users.module';
 import { GamesModule } from './games/games.module';
 import { CommunitiesModule } from './communities/communities.module';
 import { CompaniesModule } from './companies/companies.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { CompaniesModule } from './companies/companies.module';
     GamesModule,
     CommunitiesModule,
     CompaniesModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

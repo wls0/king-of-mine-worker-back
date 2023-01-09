@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { jwtPayload } from 'src/auth/jwt.payload';
 import { UsersController } from '../users.controller';
 import { UsersService } from '../users.service';
 jest.mock('../users.service.ts');
@@ -72,12 +73,17 @@ describe('UsersController', () => {
     const body = {
       nickname: 'userNickname',
     };
+    const user: jwtPayload = {
+      userIndex: '346erghgrtu6u4',
+      status: false,
+      accessLevel: false,
+    };
     it('Type is function', async () => {
       expect(typeof controller.changeNickname).toBe('function');
     });
     it('호출 확인 usersService.changeNickname', async () => {
-      await controller.changeNickname(body);
-      expect(usersService.changeNickname).toBeCalledWith(body);
+      await controller.changeNickname(user, body);
+      expect(usersService.changeNickname).toBeCalledWith(user, body);
     });
   });
 });
