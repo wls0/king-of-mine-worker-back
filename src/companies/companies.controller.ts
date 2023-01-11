@@ -10,8 +10,8 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../common/decorators/user.decorators';
-import { jwtPayload } from '../users/jwt/jwt.payload';
-import { JwtAuthGuard } from '../users/jwt/jwt.guard';
+import { jwtPayload } from '../auth/jwt.payload';
+import { JwtAuthGuard } from '../auth/jwt.guard';
 import {
   CompanyNameDto,
   CompanyCreateDto,
@@ -26,7 +26,7 @@ import { CompaniesService } from './companies.service';
 export class CompaniesController {
   constructor(private readonly companiesService: CompaniesService) {}
 
-  @Get(':companyName')
+  @Get('use/:companyName')
   @ApiOperation({ summary: '사용 중인 회사 아이디 검색' })
   async findCompanyName(@Param() param: CompanyNameDto) {
     await this.companiesService.findCompanyName(param);
@@ -44,13 +44,13 @@ export class CompaniesController {
   @Get('list')
   @ApiOperation({ summary: '전체 회사 목록 확인' })
   async findCompanyList() {
-    await this.companiesService.findCompanyList();
+    return await this.companiesService.findCompanyList();
   }
 
   @Get('staff/list')
   @ApiOperation({ summary: '소속 회사 인원 확인' })
   async findCompanyStaffList(@CurrentUser() user: jwtPayload) {
-    await this.companiesService.findCompanyStaffList(user);
+    return await this.companiesService.findCompanyStaffList(user);
   }
 
   @Delete('leave')
@@ -77,7 +77,7 @@ export class CompaniesController {
     description: '사장 등급만 사용 가능',
   })
   async staffApplyList(@CurrentUser() user: jwtPayload) {
-    await this.companiesService.staffApplyList(user);
+    return await this.companiesService.staffApplyList(user);
   }
 
   @Delete('')
@@ -88,8 +88,9 @@ export class CompaniesController {
 
   @Patch('promote')
   @ApiOperation({
-    summary: '직위 변경',
-    description: '사장 등급만 사용 가능, 사장으로 변경 시 직위 교체',
+    summary: '직위 변경, 회사 가입 승인',
+    description:
+      '가입 승인 시 5, 사장 등급만 사용 가능, 사장으로 변경 시 직위 교체',
   })
   async promoteCompany(
     @CurrentUser() user: jwtPayload,

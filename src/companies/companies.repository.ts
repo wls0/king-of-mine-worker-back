@@ -16,22 +16,22 @@ export class CompaniesRepository {
   async findCompanyName(name: string) {
     return await this.companiesRepository
       .createQueryBuilder('companies')
-      .select(['companies.companyName'])
+      .select(['companies.companyName', 'companies.index'])
       .where('companies.companyName = :companyName', { companyName: name })
       .getOne();
   }
 
   async findStaffClass(user: string) {
     return await this.companyUsersRepository
-      .createQueryBuilder('company-users')
-      .select(['company-users.user'])
-      .where('company-users.user = :user', { user })
+      .createQueryBuilder('company_users')
+      .select(['company_users.position', 'company_users.companyIndex'])
+      .where('company_users.user = :user', { user })
       .getOne();
   }
 
   async joinCompany(userIndex: string, companyIndex: string, position: number) {
     await this.companyUsersRepository
-      .createQueryBuilder('company-users')
+      .createQueryBuilder('company_users')
       .insert()
       .values({ user: userIndex, companyIndex, position })
       .execute();
@@ -40,46 +40,58 @@ export class CompaniesRepository {
   async findTotalCompany() {
     return await this.companiesRepository
       .createQueryBuilder('companies')
-      .select(['companies'])
+      .select(['companies.index', 'companies.companyName'])
       .getMany();
   }
 
   async findStaffList(companyIndex: string, join: boolean) {
-    let where = 'company-users.position :position != 6';
+    let where = 'company_users.position != :position';
     if (!join) {
-      where = 'company-users.position :position = 6';
+      where = 'company_users.position = :position';
     }
     return await this.companyUsersRepository
-      .createQueryBuilder('company-users')
-      .select(['company-users.user', 'company-users.position'])
-      .where(where)
+      .createQueryBuilder('company_users')
+      .select([
+        'users.userIndex',
+        'users.id',
+        'users.nickname',
+        'company_users.user',
+        'company_users.position',
+      ])
+      .leftJoin('company_users.user', 'users')
+      .where('company_users.companyIndex  = :companyIndex', { companyIndex })
+      .andWhere(where, { position: 6 })
       .getMany();
   }
 
   async leaveCompany(user: string) {
-    await this.companyUsersRepository
-      .createQueryBuilder('company-users')
+    console.log(user);
+    this.companyUsersRepository
+      .createQueryBuilder('company_users')
       .delete()
-      .where('company-users.user = :user', { user });
+      .where('company_users.user = :user', { user })
+      .execute();
   }
 
   async createCompany(companyName: string) {
-    await this.companiesRepository.save({ companyName });
+    const createdCompany = await this.companiesRepository.save({ companyName });
+    return createdCompany.index;
   }
 
   async deleteCompany(companyIndex: string) {
     await this.companiesRepository
       .createQueryBuilder('companies')
       .delete()
-      .where('companies.index = :index', { index: companyIndex });
+      .where('companies.index = :index', { index: companyIndex })
+      .execute();
   }
 
   async updatePosition(userIndex: string, position: number) {
     return await this.companyUsersRepository
-      .createQueryBuilder('company-users')
+      .createQueryBuilder('company_users')
       .update()
       .set({ position })
-      .where('userIndex.user = :userIndex', { userIndex })
+      .where('company_users.user = :user', { user: userIndex })
       .execute();
   }
 }
