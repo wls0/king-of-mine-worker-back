@@ -5,7 +5,7 @@ import { UsersController } from './users.controller';
 import { UsersRepository } from './users.repository';
 import { UsersService } from './users.service';
 import { Items } from '../model/items.model';
-import { GameRecords } from '../model/game-records.mode';
+import { GameRecords } from '../model/game-records.model';
 import { LogsModule } from '../logs/logs.module';
 
 @Module({

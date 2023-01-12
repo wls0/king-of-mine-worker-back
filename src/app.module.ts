@@ -5,7 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Companies } from './model/companies.model';
 import { CompanyUsers } from './model/company-users.model';
-import { GameRecords } from './model/game-records.mode';
+import { GameRecords } from './model/game-records.model';
 import { Gifts } from './model/gifts.model';
 import { Items } from './model/items.model';
 import { Stages } from './model/stages.model';

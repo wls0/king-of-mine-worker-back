@@ -14,7 +14,7 @@ export class Items {
 
   @OneToOne(() => Users, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user' })
-  user: Users;
+  user: string;
 
   @Column({ type: 'int', default: 1 })
   drill: number;

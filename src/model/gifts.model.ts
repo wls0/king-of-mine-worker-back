@@ -14,7 +14,7 @@ export class Gifts {
 
   @ManyToOne(() => Users, (users) => users.userIndex)
   @JoinColumn({ name: 'sendUser' })
-  sendUser: Users;
+  sendUser: string;
 
   @Column({ type: 'varchar', length: 36 })
   receiveUser: string;
