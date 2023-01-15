@@ -17,6 +17,7 @@ import { GamesModule } from './games/games.module';
 import { CommunitiesModule } from './communities/communities.module';
 import { CompaniesModule } from './companies/companies.module';
 import { AuthModule } from './auth/auth.module';
+import { RedisModule } from '@nestjs-modules/ioredis';
 
 @Module({
   imports: [
@@ -42,6 +43,11 @@ import { AuthModule } from './auth/auth.module';
         CompanyUsers,
       ],
       synchronize: JSON.parse(process.env.MYSQL_SYNC),
+    }),
+    RedisModule.forRoot({
+      config: {
+        url: process.env.REDIS,
+      },
     }),
     LogsModule,
     UsersModule,
