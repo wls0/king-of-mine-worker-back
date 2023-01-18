@@ -5,6 +5,8 @@ import { Repository } from 'typeorm';
 import { GameRecords } from '../model/game-records.model';
 import { Items } from '../model/items.model';
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
+import { CompanyUsers } from '../model/company-users.model';
+import { Companies } from '../model/companies.model';
 @Injectable()
 export class GamesRepository {
   constructor(
@@ -14,6 +16,10 @@ export class GamesRepository {
     @InjectRepository(Items)
     private itemsRepository: Repository<Items>,
     @InjectRedis() private readonly redis: Redis,
+    @InjectRepository(CompanyUsers)
+    private companyUsersRepository: Repository<CompanyUsers>,
+    @InjectRepository(Companies)
+    private companiesRepository: Repository<Companies>,
   ) {}
 
   async findUserGameInfo(user: string) {
@@ -93,7 +99,34 @@ export class GamesRepository {
       .execute();
   }
 
-  async findCompanyRank(companyIndex: string) {
-    await this.redis.zrange('companyRank', 0, -1, 'WITHSCORES');
+  async findCompanyRank() {
+    return await this.redis.zrange('companyRank', 0, -1, 'WITHSCORES');
+  }
+
+  async findMyCompanyPoint(companyIndex: string) {
+    return await this.redis.zscore('companyRank', companyIndex);
+  }
+
+  async updateCompanyRank(data: { companyIndex: string; point: number }) {
+    const { companyIndex, point } = data;
+    await this.redis.zadd('companyRank', point, companyIndex);
+  }
+
+  async findCompanyInfo(user: string) {
+    return await this.companyUsersRepository
+      .createQueryBuilder('company_users')
+      .select(['companyIndex'])
+      .leftJoin('company_users.companyIndex', 'companies')
+      .where('company_users.user = :user', { user })
+      .getRawOne();
+  }
+
+  async findCompanyName(companyIndex: string) {
+    const result = await this.companiesRepository
+      .createQueryBuilder('companies')
+      .select(['companies.companyName'])
+      .where('companies.index = :companyIndex', { companyIndex })
+      .getOne();
+    return result.companyName;
   }
 }

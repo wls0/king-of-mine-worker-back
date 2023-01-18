@@ -1,8 +1,7 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
-import { IsIn, IsNotEmpty, IsString } from 'class-validator';
+import { IsIn, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { Stages } from '../../model/stages.model';
 import { SaveLogDto } from '../../logs/dto/logs.dto';
-import { CompanyUsers } from '../../model/company-users.model';
 
 export class StageInfoDto extends PickType(Stages, ['stage'] as const) {}
 export class PlayGameDTO extends PickType(Stages, [
@@ -44,13 +43,13 @@ export class UseGoldDTO extends SaveLogDto {
   use: boolean;
 }
 
-export class CompanyRankDTO extends PickType(CompanyUsers, [
-  'companyIndex',
-] as const) {
+export class CompanyRankDTO {
   @ApiProperty({
     example: 10,
     description: 'point',
     required: true,
   })
+  @IsNumber()
+  @IsNotEmpty()
   point: number;
 }

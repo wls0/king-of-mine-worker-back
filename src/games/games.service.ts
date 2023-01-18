@@ -97,10 +97,66 @@ export class GamesService {
   }
 
   // 회사 순위 확인 redis 사용
-  async findCompanyRank(user: jwtPayload) {}
+  async findCompanyRank(user: jwtPayload) {
+    const { userIndex } = user;
+    const { companyIndex } = await this.gamesRepository.findCompanyInfo(
+      userIndex,
+    );
+
+    const totalRank = await this.gamesRepository.findCompanyRank();
+
+    const companyBox = [];
+    const companyPointBox = [];
+    const commondBox = [];
+    let count = 0;
+    for (const a of totalRank) {
+      if (count % 2 === 0) {
+        commondBox.push(this.gamesRepository.findCompanyName(a));
+        companyBox.push({
+          companyIndex: a,
+        });
+      } else {
+        companyPointBox.push(Number(a));
+      }
+      count++;
+    }
+    const companyNameList = await Promise.all(commondBox);
+
+    let companyListCount = 0;
+    for (const b of companyBox) {
+      b.companyName = companyNameList[companyListCount];
+      b.point = companyPointBox[companyListCount];
+      companyListCount++;
+    }
+
+    return { companyBox, myCompany: companyIndex };
+  }
 
   // 회사 순위 변경 redis 사용
-  async updateCompanyRank(data: CompanyRankDTO) {}
+  async updateCompanyRank(user: jwtPayload, data: CompanyRankDTO) {
+    const { userIndex } = user;
+    const { point } = data;
+    const { companyIndex } = await this.gamesRepository.findCompanyInfo(
+      userIndex,
+    );
+    let savePoint = 0;
+    const companyPoint = await this.gamesRepository.findMyCompanyPoint(
+      companyIndex,
+    );
+
+    if (companyPoint) {
+      savePoint = Number(companyPoint) + point;
+    } else {
+      savePoint = point;
+    }
+
+    await this.gamesRepository.updateCompanyRank({
+      companyIndex: companyIndex,
+      point: savePoint,
+    });
+
+    return '';
+  }
 
   //보유 아이탬 확인
   async findItem(user: jwtPayload) {

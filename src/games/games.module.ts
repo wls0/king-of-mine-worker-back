@@ -8,10 +8,17 @@ import { CompanyUsers } from '../model/company-users.model';
 import { GamesController } from './games.controller';
 import { GamesRepository } from './games.repository';
 import { GamesService } from './games.service';
+import { Companies } from '../model/companies.model';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([CompanyUsers, Stages, Items, GameRecords]),
+    TypeOrmModule.forFeature([
+      Companies,
+      CompanyUsers,
+      Stages,
+      Items,
+      GameRecords,
+    ]),
     LogsModule,
   ],
   controllers: [GamesController],

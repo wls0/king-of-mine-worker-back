@@ -4,7 +4,12 @@ import { jwtPayload } from '../auth/jwt.payload';
 import { CurrentUser } from '../common/decorators/user.decorators';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { GamesService } from './games.service';
-import { PlayGameDTO, StageInfoDto, UpgradeItemDTO } from './dto/games.dto';
+import {
+  CompanyRankDTO,
+  PlayGameDTO,
+  StageInfoDto,
+  UpgradeItemDTO,
+} from './dto/games.dto';
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @ApiTags('games')
@@ -49,5 +54,14 @@ export class GamesController {
   @ApiOperation({ summary: '길드 순위 확인' })
   async findCompanyRank(@CurrentUser() user: jwtPayload) {
     return await this.gamesService.findCompanyRank(user);
+  }
+
+  @Patch('company/rank')
+  @ApiOperation({ summary: '길드 순위 업데이트' })
+  async updateCompanyRank(
+    @CurrentUser() user: jwtPayload,
+    @Body() body: CompanyRankDTO,
+  ) {
+    return await this.gamesService.updateCompanyRank(user, body);
   }
 }
