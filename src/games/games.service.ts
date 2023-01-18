@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { ForbiddenException } from '@nestjs/common/exceptions';
+import {
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common/exceptions';
 import { SaveLogDto } from '../logs/dto/logs.dto';
 import { jwtPayload } from '../auth/jwt.payload';
 import {
@@ -142,6 +145,9 @@ export class GamesService {
     const { companyIndex } = await this.gamesRepository.findCompanyInfo(
       userIndex,
     );
+    if (!companyIndex) {
+      throw new NotFoundException();
+    }
     let savePoint = 0;
     const companyPoint = await this.gamesRepository.findMyCompanyPoint(
       companyIndex,

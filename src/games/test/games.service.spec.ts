@@ -3,8 +3,8 @@ import { GamesService } from '../games.service';
 import { GamesRepository } from '../games.repository';
 import { LogsService } from '../../logs/logs.service';
 import { jwtPayload } from '../../auth/jwt.payload';
-import { UseGoldDTO } from '../dto/games.dto';
-import { ForbiddenException } from '@nestjs/common';
+import { UpgradeItemDTO, UseGoldDTO } from '../dto/games.dto';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 
 jest.mock('../../logs/logs.service.ts');
 jest.mock('../games.repository.ts');
@@ -190,35 +190,121 @@ describe('GamesService', () => {
 
       const result = await service.findCompanyRank(user);
 
-      let companyListCount = 0;
-      const resultBox = [];
-      for (const b of companyList) {
-        resultBox.push({ companyName: companyList[companyListCount] });
-        b.companyName = companyList[companyListCount];
-        b.point = companyPointBox[companyListCount];
-        companyListCount++;
-      }
-
-      expect(result).toBeCalledWith({ companyBox, myCompany: companyIndex });
+      const companyBox = [
+        { companyIndex: '1번회사인덱스', companyName: '1번회사', point: 20 },
+        { companyIndex: '2번회사인덱스', companyName: '2번회사', point: 17 },
+        { companyIndex: '3번회사인덱스', companyName: '3번회사', point: 10 },
+      ];
+      expect(result).toEqual({ companyBox, myCompany: '3번회사인덱스' });
     });
-    it('본인이 소속된 회사가 없을 때', async () => {});
+    it('본인이 소속된 회사가 없을 때', async () => {
+      gamesRepository.findCompanyInfo = jest
+        .fn()
+        .mockReturnValue({ companyIndex: null });
+      gamesRepository.findCompanyRank = jest.fn().mockReturnValue(companyList);
+      gamesRepository.findCompanyName = jest
+        .fn()
+        .mockReturnValueOnce(companyName[0])
+        .mockReturnValueOnce(companyName[1])
+        .mockReturnValueOnce(companyName[2]);
+
+      const result = await service.findCompanyRank(user);
+
+      const companyBox = [
+        { companyIndex: '1번회사인덱스', companyName: '1번회사', point: 20 },
+        { companyIndex: '2번회사인덱스', companyName: '2번회사', point: 17 },
+        { companyIndex: '3번회사인덱스', companyName: '3번회사', point: 10 },
+      ];
+      expect(result).toEqual({ companyBox, myCompany: null });
+    });
   });
 
   describe('updateCompanyRank()', () => {
-    it('', async () => {});
-    it('', async () => {});
-    it('', async () => {});
+    const data = { point: 30 };
+    it('회사에 가입되지 않았을 때', async () => {
+      gamesRepository.findCompanyInfo = jest
+        .fn()
+        .mockReturnValue({ companyIndex: null });
+      await expect(async () => {
+        await service.updateCompanyRank(user, data);
+      }).rejects.toThrowError(new NotFoundException());
+    });
+    it('회사 랭킹이 있을 때 (정상 작동)', async () => {
+      gamesRepository.findCompanyInfo = jest
+        .fn()
+        .mockReturnValue({ companyIndex: '1번회사인덱스' });
+      gamesRepository.findMyCompanyPoint = jest.fn().mockReturnValue(20);
+      await service.updateCompanyRank(user, data);
+
+      expect(gamesRepository.updateCompanyRank).toBeCalledWith({
+        companyIndex: '1번회사인덱스',
+        point: 50,
+      });
+    });
+    it('회사 랭킹이 없을 때 (정상 작동)', async () => {
+      gamesRepository.findCompanyInfo = jest
+        .fn()
+        .mockReturnValue({ companyIndex: '1번회사인덱스' });
+      gamesRepository.findMyCompanyPoint = jest.fn().mockReturnValue(null);
+      await service.updateCompanyRank(user, data);
+
+      expect(gamesRepository.updateCompanyRank).toBeCalledWith({
+        companyIndex: '1번회사인덱스',
+        point: 30,
+      });
+    });
   });
 
   describe('findItem()', () => {
-    it('', async () => {});
-    it('', async () => {});
-    it('', async () => {});
+    it('gamesRepository.findHaveUserItem (정상 작동)', async () => {
+      gamesRepository.findHaveUserItem = jest.fn().mockReturnValue({
+        drill: 3,
+        oxygenRespirator: 2,
+        dynamite: 1,
+        coworker: 1,
+        gold: 100,
+      });
+      const result = await service.findItem(user);
+      expect(gamesRepository.findHaveUserItem).toBeCalled();
+      expect(result).toEqual({
+        drill: 3,
+        oxygenRespirator: 2,
+        dynamite: 1,
+        coworker: 1,
+        gold: 100,
+      });
+    });
   });
 
   describe('upgradeItem()', () => {
-    it('', async () => {});
-    it('', async () => {});
-    it('', async () => {});
+    const body: UpgradeItemDTO = { category: 'dynamite' };
+    it('아이탬 업그레이드 (정상 작동)', async () => {
+      service.findItem = jest.fn().mockReturnValue({
+        drill: 1,
+        oxygenRespirator: 1,
+        dynamite: 1,
+        coworker: 1,
+        gold: 100,
+      });
+      service.useGold = jest.fn();
+      const useGold: UseGoldDTO = {
+        gold: 50,
+        use: false,
+        type: 'item',
+        log: undefined,
+      };
+
+      const upgradeItem = {
+        category: 'dynamite',
+        itemLevel: 2,
+      };
+
+      await service.upgradeItem(user, body);
+      expect(service.useGold).toBeCalledWith(user, useGold);
+      expect(gamesRepository.upgradeItem).toBeCalledWith(
+        user.userIndex,
+        upgradeItem,
+      );
+    });
   });
 });
