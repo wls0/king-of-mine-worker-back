@@ -66,12 +66,15 @@ export class GamesService {
     const { level, exp } = await this.gamesRepository.findUserGameInfo(
       userIndex,
     );
-
-    exp + 50;
-    if (exp >= 150) {
-      level + 1;
+    let saveExp = 0;
+    let saveLevel = 0;
+    saveExp = exp;
+    saveLevel = level;
+    saveExp += 50;
+    if (saveExp >= 150) {
+      saveLevel += 1;
+      saveExp = 0;
     }
-
     const gold = Math.floor(Math.random() * 300) + 100;
     const goldLog: UseGoldDTO = {
       gold,
@@ -87,8 +90,8 @@ export class GamesService {
 
     const gameSave = {
       stage: stage + 1,
-      level,
-      exp,
+      level: saveLevel,
+      exp: saveExp,
     };
     await Promise.all([
       this.useGold(user, goldLog),
