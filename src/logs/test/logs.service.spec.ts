@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { LogsService } from '../logs.service';
 import { LogRepository } from '../logs.repository';
+import { SaveLogDto } from '../dto/logs.dto';
 jest.mock('../logs.repository.ts');
 describe('LogsService', () => {
   let service: LogsService;
@@ -30,13 +31,13 @@ describe('LogsService', () => {
   describe('saveLog', () => {
     const id = { user: '유저Index값' };
     const log = [{ category: 'use' }];
-    const data = { type: 'item', log };
+    const data: SaveLogDto = { type: 'item', log };
     it('Type is function', () => {
       expect(typeof service.saveLog).toBe('function');
     });
     it('호출 확인 LogRepository.saveLog', async () => {
-      await service.saveLog(id, data);
-      expect(logRepository.saveLog).toBeCalledWith(id, data);
+      await service.saveLog(id.user, data);
+      expect(logRepository.saveLog).toBeCalledWith(id.user, data);
     });
   });
 });
