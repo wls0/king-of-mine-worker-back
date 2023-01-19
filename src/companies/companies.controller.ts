@@ -14,7 +14,6 @@ import { jwtPayload } from '../auth/jwt.payload';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import {
   CompanyNameDto,
-  CompanyCreateDto,
   promoteCompanyDto,
   UserIndexDto,
 } from './dto/companies.dto';
@@ -63,10 +62,13 @@ export class CompaniesController {
   }
 
   @Post('')
-  @ApiOperation({ summary: '회사 생성' })
+  @ApiOperation({
+    summary: '회사 생성',
+    description: '회사 생성 비용 gold : 1000',
+  })
   async createCompany(
     @CurrentUser() user: jwtPayload,
-    @Body() body: CompanyCreateDto,
+    @Body() body: CompanyNameDto,
   ) {
     await this.companiesService.createCompany(user, body);
   }

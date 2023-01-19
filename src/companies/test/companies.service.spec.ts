@@ -3,25 +3,36 @@ import { jwtPayload } from '../../auth/jwt.payload';
 import { LogsService } from '../../logs/logs.service';
 import { CompaniesRepository } from '../companies.repository';
 import { CompaniesService } from '../companies.service';
+import { GamesService } from '../../games/games.service';
 import {
   ConflictException,
   ForbiddenException,
   NotFoundException,
 } from '@nestjs/common';
+import { UseGoldDTO } from '../../games/dto/games.dto';
+
 jest.mock('../../logs/logs.service');
 jest.mock('../companies.repository.ts');
+jest.mock('../../games/games.service.ts');
 describe('CompaniesService', () => {
   let service: CompaniesService;
   let companiesRepository: CompaniesRepository;
   let logsService: LogsService;
+  let gamesService: GamesService;
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [CompaniesService, LogsService, CompaniesRepository],
+      providers: [
+        CompaniesService,
+        LogsService,
+        CompaniesRepository,
+        GamesService,
+      ],
     }).compile();
 
     service = module.get<CompaniesService>(CompaniesService);
     logsService = module.get<LogsService>(LogsService);
     companiesRepository = module.get<CompaniesRepository>(CompaniesRepository);
+    gamesService = module.get<GamesService>(GamesService);
   });
   const user: jwtPayload = {
     userIndex: 'jroijfoirj23u8u23jro',
@@ -398,9 +409,35 @@ describe('CompaniesService', () => {
     });
   });
 
-  describe.skip('createCompany', () => {
-    it('', async () => {});
-    it('', async () => {});
-    it('', async () => {});
+  describe('createCompany', () => {
+    const body = { companyName: '생성회사이름' };
+    it('회사 가입 신청 중 또는 회사에 가입 된 경우 409에러 출력', async () => {
+      companiesRepository.findStaffClass = jest
+        .fn()
+        .mockReturnValue({ position: 5, companyIndex: user.userIndex });
+      await expect(async () => {
+        await service.createCompany(user, body);
+      }).rejects.toThrowError(new ConflictException());
+    });
+    it('정상 작동', async () => {
+      companiesRepository.findStaffClass = jest.fn().mockReturnValue(null);
+      companiesRepository.createCompany = jest
+        .fn()
+        .mockReturnValue('생성회사인덱스');
+      await service.createCompany(user, body);
+      const useGold: UseGoldDTO = {
+        gold: 1000,
+        use: false,
+        type: 'company',
+        log: undefined,
+      };
+      expect(gamesService.useGold).toBeCalledWith(user, useGold);
+      expect(companiesRepository.joinCompany).toBeCalledWith(
+        user.userIndex,
+        '생성회사인덱스',
+        1,
+      );
+      expect(companiesRepository.createCompany).toBeCalledWith('생성회사이름');
+    });
   });
 });

@@ -4,18 +4,22 @@ import {
   ForbiddenException,
   NotFoundException,
 } from '@nestjs/common/exceptions';
+import { GamesService } from '../games/games.service';
 import { jwtPayload } from '../auth/jwt.payload';
 import { CompaniesRepository } from './companies.repository';
 import {
-  CompanyCreateDto,
   CompanyNameDto,
   promoteCompanyDto,
   UserIndexDto,
 } from './dto/companies.dto';
+import { UseGoldDTO } from 'src/games/dto/games.dto';
 
 @Injectable()
 export class CompaniesService {
-  constructor(private readonly companiesRepository: CompaniesRepository) {}
+  constructor(
+    private readonly companiesRepository: CompaniesRepository,
+    private readonly gamesService: GamesService,
+  ) {}
   //회사 이름 찾기
   async findCompanyName(param: CompanyNameDto) {
     const { companyName } = param;
@@ -82,12 +86,20 @@ export class CompaniesService {
   }
 
   //회사 생성
-  async createCompany(user: jwtPayload, body: CompanyCreateDto) {
-    // 게임 골드 사용 코드 필요
-
+  async createCompany(user: jwtPayload, body: CompanyNameDto) {
     const { userIndex } = user;
-    const { companyName, gold } = body;
-
+    const { companyName } = body;
+    const useGold: UseGoldDTO = {
+      gold: 1000,
+      use: false,
+      type: 'company',
+      log: undefined,
+    };
+    const staff = await this.companiesRepository.findStaffClass(userIndex);
+    if (staff) {
+      throw new ConflictException();
+    }
+    await this.gamesService.useGold(user, useGold);
     const company = await this.companiesRepository.createCompany(companyName);
     await this.companiesRepository.joinCompany(userIndex, company, 1);
     return '';

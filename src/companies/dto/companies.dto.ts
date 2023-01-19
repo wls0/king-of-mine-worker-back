@@ -6,16 +6,6 @@ import { CompanyUsers } from '../../model/company-users.model';
 export class CompanyNameDto extends PickType(Companies, [
   'companyName',
 ] as const) {}
-export class CompanyCreateDto extends CompanyNameDto {
-  @ApiProperty({
-    example: 1000,
-    description: 'gold',
-    required: true,
-  })
-  @IsNumber()
-  @IsNotEmpty()
-  gold: number;
-}
 
 export class UserIndexDto {
   @ApiProperty({

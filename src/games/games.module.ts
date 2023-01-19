@@ -23,5 +23,6 @@ import { Companies } from '../model/companies.model';
   ],
   controllers: [GamesController],
   providers: [GamesService, GamesRepository],
+  exports: [GamesService],
 })
 export class GamesModule {}

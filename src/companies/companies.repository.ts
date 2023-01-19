@@ -65,7 +65,6 @@ export class CompaniesRepository {
   }
 
   async leaveCompany(user: string) {
-    console.log(user);
     this.companyUsersRepository
       .createQueryBuilder('company_users')
       .delete()
