@@ -1,11 +1,15 @@
 import { Injectable } from '@nestjs/common/decorators';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CompanyUsers } from '../model/company-users.model';
 import { Repository } from 'typeorm';
 import { Gifts } from '../model/gifts.model';
+
 @Injectable()
 export class CommunitiesRepository {
   constructor(
     @InjectRepository(Gifts) private giftsRepository: Repository<Gifts>,
+    @InjectRepository(CompanyUsers)
+    private companyUsersRepository: Repository<CompanyUsers>,
   ) {}
   async findSendGiftList(user: string) {
     return await this.giftsRepository
@@ -42,5 +46,17 @@ export class CommunitiesRepository {
       .set({ status: true })
       .where('gift.index = :giftIndex', { giftIndex })
       .execute();
+  }
+
+  async findCompanyUser(user: string) {
+    return await this.companyUsersRepository.findOne({ where: { user } });
+  }
+
+  async findGiftInfo(index: string) {
+    return await this.giftsRepository
+      .createQueryBuilder('gift')
+      .select()
+      .where('gift.index = :index', { index })
+      .getOne();
   }
 }
