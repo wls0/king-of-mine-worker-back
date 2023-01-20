@@ -7,6 +7,7 @@ export class Users {
   @PrimaryGeneratedColumn('uuid')
   @IsString()
   @IsNotEmpty()
+  @ApiProperty({ example: 'user-index', description: 'userIndex' })
   userIndex: string;
 
   @ApiProperty({

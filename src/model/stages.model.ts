@@ -1,9 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import { IsNotEmpty, IsNumber } from 'class-validator';
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Stages {
+  @IsNumber()
+  @Type(() => Number)
   @ApiProperty({
     example: 1,
     description: 'stage',

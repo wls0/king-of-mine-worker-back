@@ -18,6 +18,7 @@ import { CommunitiesModule } from './communities/communities.module';
 import { CompaniesModule } from './companies/companies.module';
 import { AuthModule } from './auth/auth.module';
 import { RedisModule } from '@nestjs-modules/ioredis';
+import { ManagesModule } from './manages/manages.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { RedisModule } from '@nestjs-modules/ioredis';
     CommunitiesModule,
     CompaniesModule,
     AuthModule,
+    ManagesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
