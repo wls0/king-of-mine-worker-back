@@ -15,7 +15,6 @@ export class ManagesService {
   //스테이지 정보 확인
   async findStageInfo(param: GameInfoDTO) {
     const { stage } = param;
-
     return await this.managesRepository.findStageInfo(stage);
   }
 
@@ -61,6 +60,11 @@ export class ManagesService {
   //유저 삭제
   async deleteUser(param: UserSelectDTO) {
     const { id } = param;
+    const userCheck = await this.managesRepository.findUserStatus(id);
+
+    if (!userCheck) {
+      throw new NotFoundException();
+    }
 
     await this.managesRepository.deleteUser(id);
     return '';

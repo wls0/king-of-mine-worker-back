@@ -1,6 +1,6 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { IsBoolean, IsNotEmpty, IsNumber } from 'class-validator';
-import { Users } from 'src/model/users.model';
+import { Users } from '../../model/users.model';
 import { Stages } from '../../model/stages.model';
 
 export class GameInfoDTO extends PickType(Stages, ['stage'] as const) {}
