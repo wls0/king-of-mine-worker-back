@@ -19,9 +19,11 @@ import { CompaniesModule } from './companies/companies.module';
 import { AuthModule } from './auth/auth.module';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { ManagesModule } from './manages/manages.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRoot(process.env.MONGO_DB, {
       useNewUrlParser: true,

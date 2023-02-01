@@ -10,5 +10,6 @@ import { CompanyUsers } from '../model/company-users.model';
   imports: [GamesModule, TypeOrmModule.forFeature([Gifts, CompanyUsers])],
   controllers: [CommunitiesController],
   providers: [CommunitiesService, CommunitiesRepository],
+  exports: [CommunitiesRepository],
 })
 export class CommunitiesModule {}

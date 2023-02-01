@@ -9,13 +9,17 @@ import {
   UserStatusSettingDTO,
 } from './dto/manages.dto';
 import { Users } from '../model/users.model';
-
+import { CommunitiesRepository } from '../communities/communities.repository';
+import { GamesService } from '../games/games.service';
+import { UseGoldDTO } from '../games/dto/games.dto';
 @Injectable()
 export class ManagesRepository {
   constructor(
     @InjectRepository(Stages) private stagesRepository: Repository<Stages>,
     @InjectRepository(Users) private usersRepository: Repository<Users>,
     @InjectRedis() private readonly redis: Redis,
+    private readonly communitiesRepository: CommunitiesRepository,
+    private readonly gamesService: GamesService,
   ) {}
 
   async findStageInfo(stage: number) {
@@ -107,5 +111,37 @@ export class ManagesRepository {
       .delete()
       .where('users.id =:id', { id })
       .execute();
+  }
+
+  async findCompanyRank(findDate: string) {
+    return await this.redis.zrange(
+      `${findDate}/companyRank`,
+      0,
+      -1,
+      'WITHSCORES',
+    );
+  }
+
+  async sendCompanyRankReward(receiveUser: string) {
+    const sendGift = {
+      gold: 1000,
+      receiveUser: receiveUser,
+      message: '주간 순위 랭킹 보상입니다.',
+    };
+    const user = {
+      userIndex: receiveUser,
+      status: true,
+      accessLevel: true,
+    };
+    const useGold: UseGoldDTO = {
+      gold: 1000,
+      use: false,
+      type: 'company',
+      log: undefined,
+    };
+    await Promise.all([
+      this.communitiesRepository.sendGift('manager', sendGift),
+      this.gamesService.useGold(user, useGold),
+    ]);
   }
 }
