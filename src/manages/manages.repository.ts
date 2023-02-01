@@ -115,7 +115,9 @@ export class ManagesRepository {
   }
 
   async deleteRank() {
-    const date = dayjs(new Date()).format('MM/DD');
+    const setDate = new Date();
+    setDate.setDate(setDate.getDate() - 7);
+    const date = dayjs(setDate).format('MM/DD');
     return await this.redis.zrange(`${date}/companyRank`);
   }
 
