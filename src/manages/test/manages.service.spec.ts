@@ -4,8 +4,6 @@ import { ManagesRepository } from '../manages.repository';
 import { ManagesService } from '../manages.service';
 import { GamesRepository } from '../../games/games.repository';
 import { CompaniesRepository } from '../../companies/companies.repository';
-import { GamesService } from '../../games/games.service';
-jest.mock('../../games/games.service.ts');
 jest.mock('../../games/games.repository.ts');
 jest.mock('../../companies/companies.repository.ts');
 jest.mock('../manages.repository.ts');
@@ -14,7 +12,6 @@ describe('ManagesService', () => {
   let managesRepository: ManagesRepository;
   let gamesRepository: GamesRepository;
   let companiesRepository: CompaniesRepository;
-  let gamesService: GamesService;
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -22,7 +19,6 @@ describe('ManagesService', () => {
         ManagesRepository,
         GamesRepository,
         CompaniesRepository,
-        GamesService,
       ],
     }).compile();
 
@@ -30,7 +26,6 @@ describe('ManagesService', () => {
     managesRepository = module.get<ManagesRepository>(ManagesRepository);
     gamesRepository = module.get<GamesRepository>(GamesRepository);
     companiesRepository = module.get<CompaniesRepository>(CompaniesRepository);
-    gamesService = module.get<GamesService>(GamesService);
   });
 
   describe('findStageInfo', () => {
