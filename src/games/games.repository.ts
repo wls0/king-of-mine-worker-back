@@ -125,6 +125,7 @@ export class GamesRepository {
     const day = now.getDay();
     const setDate = dayjs(now.setDate(now.getDate() - day)).format('MM/DD');
     await this.redis.zadd(`${setDate}/companyRank`, point, companyIndex);
+    await this.redis.expire(`${setDate}/companyRank`, 60 * 60 * 24 * 10);
   }
 
   async findCompanyInfo(user: string) {
