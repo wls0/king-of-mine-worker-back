@@ -161,6 +161,7 @@ describe('ManagesService', () => {
       expect(managesRepository.sendCompanyRankReward).toBeCalledWith(
         userList[2].user,
       );
+      expect(managesRepository.deleteRank).toBeCalled();
     });
 
     it('2. 정상작동 1위 회사가 1곳 이상 일 때', async () => {
@@ -182,6 +183,7 @@ describe('ManagesService', () => {
         .mockReturnValueOnce(userList2);
       await service.weeklyCompanyRankReward();
       expect(managesRepository.sendCompanyRankReward).toBeCalledTimes(6);
+      expect(managesRepository.deleteRank).toBeCalled();
     });
   });
 });

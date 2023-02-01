@@ -12,6 +12,7 @@ import { Users } from '../model/users.model';
 import { CommunitiesRepository } from '../communities/communities.repository';
 import { GamesService } from '../games/games.service';
 import { UseGoldDTO } from '../games/dto/games.dto';
+import dayjs from 'dayjs';
 @Injectable()
 export class ManagesRepository {
   constructor(
@@ -113,13 +114,9 @@ export class ManagesRepository {
       .execute();
   }
 
-  async findCompanyRank(findDate: string) {
-    return await this.redis.zrange(
-      `${findDate}/companyRank`,
-      0,
-      -1,
-      'WITHSCORES',
-    );
+  async deleteRank() {
+    const date = dayjs(new Date()).format('MM/DD');
+    return await this.redis.zrange(`${date}/companyRank`);
   }
 
   async sendCompanyRankReward(receiveUser: string) {

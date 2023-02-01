@@ -109,5 +109,6 @@ export class ManagesService {
         }
       }
     }
+    await this.managesRepository.deleteRank();
   }
 }
