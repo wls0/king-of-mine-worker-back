@@ -7,6 +7,7 @@ import { Items } from '../model/items.model';
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import { CompanyUsers } from '../model/company-users.model';
 import { Companies } from '../model/companies.model';
+import dayjs from 'dayjs';
 @Injectable()
 export class GamesRepository {
   constructor(
@@ -100,16 +101,30 @@ export class GamesRepository {
   }
 
   async findCompanyRank() {
-    return await this.redis.zrange('companyRank', 0, -1, 'WITHSCORES');
+    const now = new Date();
+    const day = now.getDay();
+    const setDate = dayjs(now.setDate(now.getDate() - day)).format('MM/DD');
+    return await this.redis.zrange(
+      `${setDate}/companyRank`,
+      0,
+      -1,
+      'WITHSCORES',
+    );
   }
 
   async findMyCompanyPoint(companyIndex: string) {
-    return await this.redis.zscore('companyRank', companyIndex);
+    const now = new Date();
+    const day = now.getDay();
+    const setDate = dayjs(now.setDate(now.getDate() - day)).format('MM/DD');
+    return await this.redis.zscore(`${setDate}/companyRank`, companyIndex);
   }
 
   async updateCompanyRank(data: { companyIndex: string; point: number }) {
     const { companyIndex, point } = data;
-    await this.redis.zadd('companyRank', point, companyIndex);
+    const now = new Date();
+    const day = now.getDay();
+    const setDate = dayjs(now.setDate(now.getDate() - day)).format('MM/DD');
+    await this.redis.zadd(`${setDate}/companyRank`, point, companyIndex);
   }
 
   async findCompanyInfo(user: string) {
