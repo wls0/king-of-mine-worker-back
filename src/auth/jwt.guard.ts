@@ -6,13 +6,11 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtService } from '@nestjs/jwt';
-
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
   constructor(private jwtService: JwtService) {
     super();
   }
-
   validateToken(token: string) {
     try {
       //관리자, 유저 분기 처리예정
@@ -21,8 +19,6 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     } catch (e) {
       switch (e.message) {
         case 'jwt expired':
-          //토큰 기간 만료 시 리프레시 작업예정
-          console.log('토큰 만료');
         case 'invalid token':
         case 'jwt malformed':
         case 'jwt signature is required':

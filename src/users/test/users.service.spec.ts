@@ -104,6 +104,8 @@ describe('UsersService', () => {
         accessLevel: true,
       };
       usersRepository.getUserLoginInfo = jest.fn().mockReturnValue(user);
+      service.redis.set = jest.fn();
+      service.redis.expire = jest.fn();
       const result = await service.login(body);
       jwtService.sign(
         {
@@ -119,6 +121,8 @@ describe('UsersService', () => {
       };
       expect(result).toBe(result);
       expect(logsService.saveLog).toBeCalledWith(user.userIndex, saveLog);
+      expect(service.redis.set).toBeCalledWith(user.userIndex, '');
+      expect(service.redis.expire).toBeCalledWith(user.userIndex, 60 * 60 * 24);
     });
   });
 

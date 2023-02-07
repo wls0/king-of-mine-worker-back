@@ -10,6 +10,7 @@ import { passwordMaker, passwordDecoding } from './utils/util';
 import { LogsService } from '../logs/logs.service';
 import { SaveLogDto } from '../logs/dto/logs.dto';
 import { jwtPayload } from '../auth/jwt.payload';
+import Redis from 'ioredis';
 @Injectable()
 export class UsersService {
   constructor(
@@ -17,6 +18,8 @@ export class UsersService {
     private readonly jwtService: JwtService,
     private readonly logService: LogsService,
   ) {}
+
+  redis: Redis = new Redis(process.env.REDIS);
   async findId(param: UserIdDto) {
     const { id } = param;
     const user = await this.usersRepository.findUser(id);
@@ -65,7 +68,10 @@ export class UsersService {
           type: 'account',
           log: { title: 'login' },
         };
+
         await this.logService.saveLog(user.userIndex, saveLog);
+        await this.redis.set(user.userIndex, '');
+        await this.redis.expire(user.userIndex, 60 * 60 * 24);
         return token;
       } else {
         throw new UnauthorizedException();
