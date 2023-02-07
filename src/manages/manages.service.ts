@@ -89,8 +89,8 @@ export class ManagesService {
         if (count % 2 === 0) {
           companyBox.push(a);
         } else {
-          if (rank <= a) {
-            rank = a;
+          if (rank <= Number(a)) {
+            rank = Number(a);
           } else {
             companyBox.pop();
             break;

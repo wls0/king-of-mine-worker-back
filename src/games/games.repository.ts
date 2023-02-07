@@ -4,10 +4,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { GameRecords } from '../model/game-records.model';
 import { Items } from '../model/items.model';
-import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
+// import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import { CompanyUsers } from '../model/company-users.model';
 import { Companies } from '../model/companies.model';
 import dayjs from 'dayjs';
+import Redis from 'ioredis';
 @Injectable()
 export class GamesRepository {
   constructor(
@@ -16,13 +17,13 @@ export class GamesRepository {
     private gameRecordsRepository: Repository<GameRecords>,
     @InjectRepository(Items)
     private itemsRepository: Repository<Items>,
-    @InjectRedis() private readonly redis: Redis,
     @InjectRepository(CompanyUsers)
     private companyUsersRepository: Repository<CompanyUsers>,
     @InjectRepository(Companies)
-    private companiesRepository: Repository<Companies>,
+    private companiesRepository: Repository<Companies>, // private readonly redis: Redis,
   ) {}
 
+  redis: Redis = new Redis(process.env.REDIS);
   async findUserGameInfo(user: string) {
     return await this.gameRecordsRepository
       .createQueryBuilder('game_records')

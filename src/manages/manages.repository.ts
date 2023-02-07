@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Stages } from '../model/stages.model';
 import { Repository } from 'typeorm';
-import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import {
   GameStageDTO,
   UpdateGameStageDTO,
@@ -13,16 +12,16 @@ import { CommunitiesRepository } from '../communities/communities.repository';
 import { GamesService } from '../games/games.service';
 import { UseGoldDTO } from '../games/dto/games.dto';
 import dayjs from 'dayjs';
+import Redis from 'ioredis';
 @Injectable()
 export class ManagesRepository {
   constructor(
     @InjectRepository(Stages) private stagesRepository: Repository<Stages>,
     @InjectRepository(Users) private usersRepository: Repository<Users>,
-    @InjectRedis() private readonly redis: Redis,
     private readonly communitiesRepository: CommunitiesRepository,
     private readonly gamesService: GamesService,
   ) {}
-
+  redis: Redis;
   async findStageInfo(stage: number) {
     return this.stagesRepository
       .createQueryBuilder('stages')
@@ -118,7 +117,7 @@ export class ManagesRepository {
     const setDate = new Date();
     setDate.setDate(setDate.getDate() - 7);
     const date = dayjs(setDate).format('MM/DD');
-    return await this.redis.zrange(`${date}/companyRank`);
+    // return await this.redis.zrange(`${date}/companyRank`);
   }
 
   async sendCompanyRankReward(receiveUser: string) {

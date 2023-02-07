@@ -2,6 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import expressBasicAuth from 'express-basic-auth';
+import { SocketIoAdapter } from './adapters/adapters';
 import { AppModule } from './app.module';
 import { ErrorExceptionFilter } from './common/filters/error.exception';
 import { SuccessInterceptor } from './common/interceptors/success.interceptor';
@@ -11,6 +12,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new ErrorExceptionFilter());
   app.useGlobalInterceptors(new SuccessInterceptor());
+  app.useWebSocketAdapter(new SocketIoAdapter(app));
   if (process.env.NODE_ENV === 'product') {
     app.use(
       ['/docs'],
@@ -30,7 +32,6 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
-
   await app.listen(process.env.PORT);
 }
 bootstrap();

@@ -17,10 +17,9 @@ import { GamesModule } from './games/games.module';
 import { CommunitiesModule } from './communities/communities.module';
 import { CompaniesModule } from './companies/companies.module';
 import { AuthModule } from './auth/auth.module';
-import { RedisModule } from '@nestjs-modules/ioredis';
 import { ManagesModule } from './manages/manages.module';
 import { ScheduleModule } from '@nestjs/schedule';
-
+import { LoginSocketsModule } from './login-sockets/login-sockets.module';
 @Module({
   imports: [
     ScheduleModule.forRoot(),
@@ -47,11 +46,6 @@ import { ScheduleModule } from '@nestjs/schedule';
       ],
       synchronize: JSON.parse(process.env.MYSQL_SYNC),
     }),
-    RedisModule.forRoot({
-      config: {
-        url: process.env.REDIS,
-      },
-    }),
     LogsModule,
     UsersModule,
     GamesModule,
@@ -59,6 +53,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     CompaniesModule,
     AuthModule,
     ManagesModule,
+    LoginSocketsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

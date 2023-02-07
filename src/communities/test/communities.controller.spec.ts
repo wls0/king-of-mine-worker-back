@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { jwtPayload } from '../../auth/jwt.payload';
 import { CommunitiesController } from '../communities.controller';
 import { CommunitiesService } from '../communities.service';
+import { SendGoldDTO } from '../dto/communities.dto';
 jest.mock('../communities.service.ts');
 describe('CommunitiesController', () => {
   let controller: CommunitiesController;
@@ -35,7 +36,11 @@ describe('CommunitiesController', () => {
   });
 
   describe('sendGift', () => {
-    const body = { gold: 300, recevieUser: '선물받는유저인덱스' };
+    const body: SendGoldDTO = {
+      gold: 300,
+      receiveUser: '선물받는유저인덱스',
+      message: '선물메시지',
+    };
     it('communitiesService.sendGift 호출 확인', async () => {
       await controller.sendGift(user, body);
       expect(communitiesService.sendGift).toBeCalledWith(user, body);

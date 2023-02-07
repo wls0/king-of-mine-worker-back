@@ -105,12 +105,14 @@ export class GamesService {
   // 회사 순위 확인 redis 사용
   async findCompanyRank(user: jwtPayload) {
     const { userIndex } = user;
-    const { companyIndex } = await this.gamesRepository.findCompanyInfo(
-      userIndex,
-    );
+    let myCompany: string = null;
+    const companyCheck = await this.gamesRepository.findCompanyInfo(userIndex);
+    if (companyCheck) {
+      const { companyIndex } = companyCheck;
+      myCompany = companyIndex;
+    }
 
     const totalRank = await this.gamesRepository.findCompanyRank();
-
     const companyBox = [];
     const companyPointBox = [];
     const commondBox = [];
@@ -135,7 +137,7 @@ export class GamesService {
       companyListCount++;
     }
 
-    return { companyBox, myCompany: companyIndex };
+    return { companyBox, myCompany };
   }
 
   // 회사 순위 변경 redis 사용
