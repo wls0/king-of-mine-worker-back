@@ -71,7 +71,7 @@ export class UsersService {
 
         await this.logService.saveLog(user.userIndex, saveLog);
         await this.redis.set(user.userIndex, '');
-        await this.redis.expire(user.userIndex, 60 * 60 * 24);
+        await this.redis.expire(user.userIndex, 1000 * 60 * 60 * 24);
         return token;
       } else {
         throw new UnauthorizedException();

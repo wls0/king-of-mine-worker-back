@@ -122,7 +122,7 @@ describe('UsersService', () => {
       expect(result).toBe(result);
       expect(logsService.saveLog).toBeCalledWith(user.userIndex, saveLog);
       expect(service.redis.set).toBeCalledWith(user.userIndex, '');
-      expect(service.redis.expire).toBeCalledWith(user.userIndex, 60 * 60 * 24);
+      expect(service.redis.expire).toBeCalledWith(user.userIndex, 1000 * 60 * 60 * 24);
     });
   });
 
