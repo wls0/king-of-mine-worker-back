@@ -89,7 +89,7 @@ export class ManagesRepository {
   async findUserStatus(id: string) {
     return await this.usersRepository
       .createQueryBuilder('users')
-      .select(['status'])
+      .select(['status, userIndex'])
       .where('users.id = :id', { id })
       .getOne();
   }
@@ -105,19 +105,24 @@ export class ManagesRepository {
       .execute();
   }
 
-  async deleteUser(id: string) {
-    await this.usersRepository
-      .createQueryBuilder('users')
-      .delete()
-      .where('users.id =:id', { id })
-      .execute();
+  async deleteUser(id: string, userIndex: string) {
+    const socket = await this.redis.get(userIndex);
+    await Promise.all([
+      this.usersRepository
+        .createQueryBuilder('users')
+        .delete()
+        .where('users.id =:id', { id })
+        .execute(),
+      this.redis.del(socket),
+      this.redis.del(userIndex),
+    ]);
   }
 
   async deleteRank() {
     const setDate = new Date();
     setDate.setDate(setDate.getDate() - 7);
     const date = dayjs(setDate).format('MM/DD');
-    // return await this.redis.zrange(`${date}/companyRank`);
+    return await this.redis.del(`${date}/companyRank`);
   }
 
   async sendCompanyRankReward(receiveUser: string) {

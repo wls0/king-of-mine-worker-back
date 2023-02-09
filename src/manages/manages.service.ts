@@ -73,7 +73,7 @@ export class ManagesService {
       throw new NotFoundException();
     }
 
-    await this.managesRepository.deleteUser(id);
+    await this.managesRepository.deleteUser(id, userCheck.userIndex);
     return '';
   }
 

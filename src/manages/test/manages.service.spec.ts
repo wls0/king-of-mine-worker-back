@@ -124,10 +124,13 @@ describe('ManagesService', () => {
     });
 
     it('정상 작동', async () => {
-      const data = { status: false };
+      const data = { status: false, userIndex: '유저인덱스' };
       managesRepository.findUserStatus = jest.fn().mockReturnValue(data);
       await service.deleteUser(param);
-      expect(managesRepository.deleteUser).toBeCalledWith(param.id);
+      expect(managesRepository.deleteUser).toBeCalledWith(
+        param.id,
+        data.userIndex,
+      );
     });
   });
 
