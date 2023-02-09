@@ -16,7 +16,7 @@ export class LoginSocketsService {
     }
 
     const beforSocket = await this.redis.get(userIndex);
-    if (beforSocket) {
+    if (beforSocket !== '') {
       await this.redis.del(beforSocket);
       await this.redis.set(userIndex, '');
       return {
