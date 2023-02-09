@@ -41,6 +41,7 @@ describe('LoginSocketsService', () => {
       service.redis.get = jest.fn().mockReturnValue('');
       service.redis.del = jest.fn();
       service.redis.set = jest.fn();
+      service.redis.expire = jest.fn();
       const result = await service.login(socketId, { userIndex });
       expect(result).toEqual({
         event: 'loginSuccess',
