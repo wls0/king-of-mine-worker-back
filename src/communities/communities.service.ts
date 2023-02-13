@@ -4,6 +4,8 @@ import {
   NotFoundException,
 } from '@nestjs/common/exceptions';
 import { UseGoldDTO } from 'src/games/dto/games.dto';
+import { SaveLogDto } from '../logs/dto/logs.dto';
+import { LogsService } from '../logs/logs.service';
 import { jwtPayload } from '../auth/jwt.payload';
 import { GamesService } from '../games/games.service';
 import { CommunitiesRepository } from './communities.repository';
@@ -14,6 +16,7 @@ export class CommunitiesService {
   constructor(
     private readonly gamesService: GamesService,
     private readonly communitiesRepository: CommunitiesRepository,
+    private readonly logsService: LogsService,
   ) {}
   //보낸 선물 목록 리스트 확인
   async findSendGiftList(user: jwtPayload) {
@@ -46,9 +49,16 @@ export class CommunitiesService {
     if (userStaff.companyIndex !== receiveStaff.companyIndex) {
       throw new ForbiddenException();
     }
+    const saveLog: SaveLogDto = {
+      type: 'item',
+      log: { title: 'giftSend', to: receiveUser },
+    };
 
     await this.gamesService.useGold(user, useGold);
-    await this.communitiesRepository.sendGift(userIndex, body);
+    Promise.all([
+      this.logsService.saveLog(userIndex, saveLog),
+      this.communitiesRepository.sendGift(userIndex, body),
+    ]);
     return '';
   }
 
@@ -73,11 +83,17 @@ export class CommunitiesService {
       log: undefined,
     };
 
-    await Promise.all([
+    const saveLog: SaveLogDto = {
+      type: 'item',
+      log: { title: 'receiveGift', gold: 500 },
+    };
+
+    Promise.all([
       this.gamesService.useGold(user, useGold),
       this.communitiesRepository.receiveGift(giftIndex),
     ]);
 
+    this.logsService.saveLog(userIndex, saveLog);
     return '';
   }
 }

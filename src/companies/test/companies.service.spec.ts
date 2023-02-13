@@ -10,6 +10,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UseGoldDTO } from '../../games/dto/games.dto';
+import { SaveLogDto } from 'src/logs/dto/logs.dto';
 
 jest.mock('../../logs/logs.service');
 jest.mock('../companies.repository.ts');
@@ -98,6 +99,11 @@ describe('CompaniesService', () => {
         '75d84bf4-cd53-40fe-98a3-b8e1ba528238',
         6,
       );
+      const saveLog: SaveLogDto = {
+        type: 'company',
+        log: { title: 'companyJoin', companyIndex: '테스트회사이름' },
+      };
+      expect(logsService.saveLog).toBeCalledWith(user.userIndex, saveLog);
     });
   });
 

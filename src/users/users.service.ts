@@ -96,6 +96,13 @@ export class UsersService {
     const { userIndex } = user;
     await this.findNickname(body);
     await this.usersRepository.updateNickname(userIndex, nickname);
+
+    const saveLog: SaveLogDto = {
+      type: 'account',
+      log: { title: 'changeNickName' },
+    };
+
+    await this.logService.saveLog(user.userIndex, saveLog);
     return '';
   }
 }

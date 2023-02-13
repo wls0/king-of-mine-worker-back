@@ -162,8 +162,13 @@ describe('UsersService', () => {
       }).rejects.toThrowError(new ConflictException());
     });
     it('닉네임 정상 변경', async () => {
+      const saveLog = {
+        type: 'account',
+        log: { title: 'changeNickName' },
+      };
       usersRepository.findNickname = jest.fn().mockReturnValue(null);
       const result = await service.changeNickname(user, body);
+      expect(logsService.saveLog).toBeCalledWith(user.userIndex, saveLog);
       expect(result).toBe('');
     });
   });

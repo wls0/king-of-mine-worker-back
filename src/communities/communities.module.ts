@@ -6,8 +6,13 @@ import { CommunitiesController } from './communities.controller';
 import { CommunitiesRepository } from './communities.repository';
 import { CommunitiesService } from './communities.service';
 import { CompanyUsers } from '../model/company-users.model';
+import { LogsModule } from 'src/logs/logs.module';
 @Module({
-  imports: [GamesModule, TypeOrmModule.forFeature([Gifts, CompanyUsers])],
+  imports: [
+    GamesModule,
+    TypeOrmModule.forFeature([Gifts, CompanyUsers]),
+    LogsModule,
+  ],
   controllers: [CommunitiesController],
   providers: [CommunitiesService, CommunitiesRepository],
   exports: [CommunitiesRepository],

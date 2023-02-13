@@ -12,13 +12,16 @@ import {
   promoteCompanyDto,
   UserIndexDto,
 } from './dto/companies.dto';
-import { UseGoldDTO } from 'src/games/dto/games.dto';
+import { UseGoldDTO } from '../games/dto/games.dto';
+import { LogsService } from '../logs/logs.service';
+import { SaveLogDto } from '../logs/dto/logs.dto';
 
 @Injectable()
 export class CompaniesService {
   constructor(
     private readonly companiesRepository: CompaniesRepository,
     private readonly gamesService: GamesService,
+    private readonly logsService: LogsService,
   ) {}
   //회사 이름 찾기
   async findCompanyName(param: CompanyNameDto) {
@@ -45,7 +48,12 @@ export class CompaniesService {
     if (!company) {
       throw new NotFoundException();
     }
-    await this.companiesRepository.joinCompany(userIndex, company.index, 6);
+    const saveLog: SaveLogDto = {
+      type: 'company',
+      log: { title: 'companyJoin', companyIndex: '테스트회사이름' },
+    };
+    this.companiesRepository.joinCompany(userIndex, company.index, 6);
+    this.logsService.saveLog(userIndex, saveLog);
     return '';
   }
 

@@ -1,5 +1,6 @@
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { LogsService } from '../../logs/logs.service';
 import { jwtPayload } from '../../auth/jwt.payload';
 import { GamesService } from '../../games/games.service';
 import { CommunitiesRepository } from '../communities.repository';
@@ -7,13 +8,20 @@ import { CommunitiesService } from '../communities.service';
 import { SendGoldDTO } from '../dto/communities.dto';
 jest.mock('../../games/games.service.ts');
 jest.mock('../communities.repository.ts');
+jest.mock('../../logs/logs.service');
 describe('CommunitiesService', () => {
   let service: CommunitiesService;
   let communitiesRepository: CommunitiesRepository;
   let gamesService: GamesService;
+  let logsService: LogsService;
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [CommunitiesService, CommunitiesRepository, GamesService],
+      providers: [
+        CommunitiesService,
+        CommunitiesRepository,
+        GamesService,
+        LogsService,
+      ],
     }).compile();
 
     service = module.get<CommunitiesService>(CommunitiesService);
@@ -21,6 +29,7 @@ describe('CommunitiesService', () => {
       CommunitiesRepository,
     );
     gamesService = module.get<GamesService>(GamesService);
+    logsService = module.get<LogsService>(LogsService);
   });
   const user: jwtPayload = {
     userIndex: 'jroijfoirj23u8u23jro',
@@ -123,6 +132,10 @@ describe('CommunitiesService', () => {
       }).rejects.toThrowError(new ForbiddenException());
     });
     it('정상 작동', async () => {
+      const saveLog = {
+        type: 'item',
+        log: { title: 'giftSend', to: body.receiveUser },
+      };
       communitiesRepository.findCompanyUser = jest
         .fn()
         .mockReturnValue({ companyIndex: 'companyIndex' });
@@ -137,6 +150,7 @@ describe('CommunitiesService', () => {
         user.userIndex,
         body,
       );
+      expect(logsService.saveLog).toBeCalledWith(user.userIndex, saveLog);
     });
   });
 
@@ -172,6 +186,10 @@ describe('CommunitiesService', () => {
     });
 
     it('정상 작동', async () => {
+      const saveLog = {
+        type: 'item',
+        log: { title: 'receiveGift', gold: 500 },
+      };
       communitiesRepository.findGiftInfo = jest.fn().mockReturnValue({
         receiveUser: user.userIndex,
         status: false,
@@ -185,6 +203,7 @@ describe('CommunitiesService', () => {
         log: undefined,
       });
       expect(communitiesRepository.receiveGift).toBeCalledWith(body.giftIndex);
+      expect(logsService.saveLog).toBeCalledWith(user.userIndex, saveLog);
     });
   });
 });
