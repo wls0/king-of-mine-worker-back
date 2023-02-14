@@ -63,12 +63,17 @@ describe('GamesService', () => {
       const useGold: UseGoldDTO = {
         use: true,
         type: 'stage',
-        log: '',
+        log: { title: 'useGold', use: true, gold: 300 },
         gold: 300,
+      };
+      const saveLog = {
+        type: useGold.type,
+        log: useGold.log,
       };
       service.findItem = jest.fn().mockReturnValue({ gold: 200 });
       await service.useGold(user, useGold);
       expect(gamesRepository.useGold).toBeCalledWith(user.userIndex, 500);
+      expect(logsService.saveLog).toBeCalledWith(user.userIndex, saveLog);
     });
   });
 
@@ -113,7 +118,10 @@ describe('GamesService', () => {
         diamond: 3,
         lithium: 4,
       };
-
+      const saveLog = {
+        type: 'stage',
+        log: { title: 'playGame', stage: 4, level: 2, exp: 0 },
+      };
       gamesRepository.findStageInfo = jest.fn().mockReturnValue(stageInfo);
       gamesRepository.findUserGameInfo = jest
         .fn()
@@ -124,13 +132,13 @@ describe('GamesService', () => {
         gold: 202,
         use: true,
         type: 'stage',
-        log: undefined,
+        log: { title: 'playGame', gold: 202 },
       });
       expect(gamesRepository.updateUserPlayGame).toBeCalledWith(
         user.userIndex,
         { stage: 4, level: 2, exp: 0 },
       );
-
+      expect(logsService.saveLog).toBeCalledWith(user.userIndex, saveLog);
       jest.spyOn(global.Math, 'random').mockRestore();
     });
 
@@ -145,7 +153,10 @@ describe('GamesService', () => {
         diamond: 3,
         lithium: 4,
       };
-
+      const saveLog = {
+        type: 'stage',
+        log: { title: 'playGame', stage: 4, level: 1, exp: 100 },
+      };
       gamesRepository.findStageInfo = jest.fn().mockReturnValue(stageInfo);
       gamesRepository.findUserGameInfo = jest
         .fn()
@@ -156,13 +167,13 @@ describe('GamesService', () => {
         gold: 202,
         use: true,
         type: 'stage',
-        log: undefined,
+        log: { title: 'playGame', gold: 202 },
       });
       expect(gamesRepository.updateUserPlayGame).toBeCalledWith(
         user.userIndex,
         { stage: 4, level: 1, exp: 100 },
       );
-
+      expect(logsService.saveLog).toBeCalledWith(user.userIndex, saveLog);
       jest.spyOn(global.Math, 'random').mockRestore();
     });
   });
@@ -291,20 +302,24 @@ describe('GamesService', () => {
         gold: 50,
         use: false,
         type: 'item',
-        log: undefined,
+        log: { title: 'useGold', use: false, gold: 50 },
       };
 
       const upgradeItem = {
         category: 'dynamite',
         itemLevel: 2,
       };
-
+      const saveLog = {
+        type: 'item',
+        log: { title: 'updateItem', category: body.category, itemLevel: 2 },
+      };
       await service.upgradeItem(user, body);
       expect(service.useGold).toBeCalledWith(user, useGold);
       expect(gamesRepository.upgradeItem).toBeCalledWith(
         user.userIndex,
         upgradeItem,
       );
+      expect(logsService.saveLog).toBeCalledWith(user.userIndex, saveLog);
     });
   });
 });

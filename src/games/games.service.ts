@@ -13,9 +13,13 @@ import {
   UseGoldDTO,
 } from './dto/games.dto';
 import { GamesRepository } from './games.repository';
+import { LogsService } from '../logs/logs.service';
 @Injectable()
 export class GamesService {
-  constructor(private readonly gamesRepository: GamesRepository) {}
+  constructor(
+    private readonly gamesRepository: GamesRepository,
+    private readonly logsService: LogsService,
+  ) {}
   // 진행중인 스테이지 확인
   async findStage(user: jwtPayload) {
     return await this.gamesRepository.findUserGameInfo(user.userIndex);
@@ -43,7 +47,8 @@ export class GamesService {
       }
     }
 
-    await this.gamesRepository.useGold(userIndex, finalGold);
+    this.gamesRepository.useGold(userIndex, finalGold);
+    this.logsService.saveLog(userIndex, { type, log });
     return '';
   }
 
@@ -83,12 +88,17 @@ export class GamesService {
       gold,
       use: true,
       type: 'stage',
-      log: undefined,
+      log: { title: 'playGame', gold },
     };
 
     const gameSaveLog: SaveLogDto = {
       type: 'stage',
-      log: undefined,
+      log: {
+        title: 'playGame',
+        stage: stage + 1,
+        level: saveLevel,
+        exp: saveExp,
+      },
     };
 
     const gameSave = {
@@ -96,10 +106,12 @@ export class GamesService {
       level: saveLevel,
       exp: saveExp,
     };
-    await Promise.all([
+    Promise.all([
       this.useGold(user, goldLog),
       this.gamesRepository.updateUserPlayGame(userIndex, gameSave),
     ]);
+
+    this.logsService.saveLog(userIndex, gameSaveLog);
   }
 
   // 회사 순위 확인 redis 사용
@@ -183,18 +195,19 @@ export class GamesService {
       gold,
       use: false,
       type: 'item',
-      log: undefined,
+      log: { title: 'useGold', use: false, gold },
     };
-
+    const itemLevel = haveItem[`${category}`] + 1;
     const upgradeItem = {
       category,
-      itemLevel: haveItem[`${category}`] + 1,
+      itemLevel: itemLevel,
     };
     const saveLog: SaveLogDto = {
       type: 'item',
-      log: undefined,
+      log: { title: 'updateItem', category, itemLevel },
     };
-    await this.useGold(user, useGold);
-    await this.gamesRepository.upgradeItem(user.userIndex, upgradeItem);
+    this.useGold(user, useGold);
+    this.gamesRepository.upgradeItem(user.userIndex, upgradeItem);
+    this.logsService.saveLog(user.userIndex, saveLog);
   }
 }
