@@ -20,6 +20,7 @@ import { AuthModule } from './auth/auth.module';
 import { ManagesModule } from './manages/manages.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { LoginSocketsModule } from './login-sockets/login-sockets.module';
+import { RedisModule } from './redis/redis.module';
 @Module({
   imports: [
     ScheduleModule.forRoot(),
@@ -54,6 +55,7 @@ import { LoginSocketsModule } from './login-sockets/login-sockets.module';
     AuthModule,
     ManagesModule,
     LoginSocketsModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [AppService],
