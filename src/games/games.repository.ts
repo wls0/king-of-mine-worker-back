@@ -7,7 +7,7 @@ import { Items } from '../model/items.model';
 import { CompanyUsers } from '../model/company-users.model';
 import { Companies } from '../model/companies.model';
 import dayjs from 'dayjs';
-import Redis from 'ioredis';
+import { RedisService } from '../redis/redis.service';
 @Injectable()
 export class GamesRepository {
   constructor(
@@ -19,10 +19,9 @@ export class GamesRepository {
     @InjectRepository(CompanyUsers)
     private companyUsersRepository: Repository<CompanyUsers>,
     @InjectRepository(Companies)
-    private companiesRepository: Repository<Companies>, // private readonly redis: Redis,
+    private companiesRepository: Repository<Companies>,
+    private redis: RedisService,
   ) {}
-
-  redis: Redis = new Redis(process.env.REDIS);
   async findUserGameInfo(user: string) {
     return await this.gameRecordsRepository
       .createQueryBuilder('game_records')
@@ -104,19 +103,22 @@ export class GamesRepository {
     const now = new Date();
     const day = now.getDay();
     const setDate = dayjs(now.setDate(now.getDate() - day)).format('MM/DD');
-    return await this.redis.zrange(
-      `${setDate}/companyRank`,
-      0,
-      -1,
-      'WITHSCORES',
-    );
+    return await this.redis.zrange({
+      name: `${setDate}/companyRank`,
+      start: 0,
+      end: -1,
+      optionStatus: true,
+    });
   }
 
   async findMyCompanyPoint(companyIndex: string) {
     const now = new Date();
     const day = now.getDay();
     const setDate = dayjs(now.setDate(now.getDate() - day)).format('MM/DD');
-    return await this.redis.zscore(`${setDate}/companyRank`, companyIndex);
+    return await this.redis.zscore({
+      name: `${setDate}/companyRank`,
+      index: companyIndex,
+    });
   }
 
   async updateCompanyRank(data: { companyIndex: string; point: number }) {
@@ -124,8 +126,15 @@ export class GamesRepository {
     const now = new Date();
     const day = now.getDay();
     const setDate = dayjs(now.setDate(now.getDate() - day)).format('MM/DD');
-    await this.redis.zadd(`${setDate}/companyRank`, point, companyIndex);
-    await this.redis.expire(`${setDate}/companyRank`, 1000 * 60 * 60 * 24 * 10);
+    await this.redis.zadd({
+      name: `${setDate}/companyRank`,
+      point,
+      index: companyIndex,
+    });
+    await this.redis.expire({
+      name: `${setDate}/companyRank`,
+      time: 1000 * 60 * 60 * 24 * 10,
+    });
   }
 
   async findCompanyInfo(user: string) {

@@ -9,6 +9,7 @@ import { GamesController } from './games.controller';
 import { GamesRepository } from './games.repository';
 import { GamesService } from './games.service';
 import { Companies } from '../model/companies.model';
+import { RedisModule } from '../redis/redis.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { Companies } from '../model/companies.model';
       GameRecords,
     ]),
     LogsModule,
+    RedisModule,
   ],
   controllers: [GamesController],
   providers: [GamesService, GamesRepository],
