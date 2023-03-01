@@ -9,6 +9,7 @@ import { Stages } from '../model/stages.model';
 import { Users } from '../model/users.model';
 import { GamesModule } from '../games/games.module';
 import { CompaniesModule } from '../companies/companies.module';
+import { RedisModule } from '../redis/redis.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { CompaniesModule } from '../companies/companies.module';
     GamesModule,
     LogsModule,
     TypeOrmModule.forFeature([Stages, Users]),
+    RedisModule,
   ],
   controllers: [ManagesController],
   providers: [ManagesService, ManagesRepository],

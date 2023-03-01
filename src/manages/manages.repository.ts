@@ -12,7 +12,7 @@ import { CommunitiesRepository } from '../communities/communities.repository';
 import { GamesService } from '../games/games.service';
 import { UseGoldDTO } from '../games/dto/games.dto';
 import dayjs from 'dayjs';
-import Redis from 'ioredis';
+import { RedisService } from '../redis/redis.service';
 @Injectable()
 export class ManagesRepository {
   constructor(
@@ -20,8 +20,8 @@ export class ManagesRepository {
     @InjectRepository(Users) private usersRepository: Repository<Users>,
     private readonly communitiesRepository: CommunitiesRepository,
     private readonly gamesService: GamesService,
+    private readonly redis: RedisService,
   ) {}
-  redis: Redis;
   async findStageInfo(stage: number) {
     return this.stagesRepository
       .createQueryBuilder('stages')
