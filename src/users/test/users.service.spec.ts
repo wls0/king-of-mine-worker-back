@@ -6,9 +6,10 @@ import { JwtService } from '@nestjs/jwt';
 import { LogsService } from '../../logs/logs.service';
 import { passwordMaker } from '../utils/util';
 import { jwtPayload } from '../../auth/jwt.payload';
+import { RedisService } from '../../redis/redis.service';
 jest.mock('../users.repository.ts');
 jest.mock('../../logs/logs.service');
-
+jest.mock('../../redis/redis.service');
 process.env.CRYPTO = process.env.CRYPTO;
 process.env.JWT = process.env.JWT;
 describe('UsersService', () => {
@@ -16,14 +17,22 @@ describe('UsersService', () => {
   let usersRepository: UsersRepository;
   let logsService: LogsService;
   let jwtService: JwtService;
+  let redis: RedisService;
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [UsersService, UsersRepository, JwtService, LogsService],
+      providers: [
+        UsersService,
+        UsersRepository,
+        JwtService,
+        LogsService,
+        RedisService,
+      ],
     }).compile();
     jwtService = new JwtService();
     usersRepository = module.get<UsersRepository>(UsersRepository);
     service = module.get<UsersService>(UsersService);
     logsService = module.get<LogsService>(LogsService);
+    redis = module.get<RedisService>(RedisService);
   });
 
   describe('findId', () => {
@@ -104,8 +113,8 @@ describe('UsersService', () => {
         accessLevel: true,
       };
       usersRepository.getUserLoginInfo = jest.fn().mockReturnValue(user);
-      service.redis.set = jest.fn();
-      service.redis.expire = jest.fn();
+      redis.set = jest.fn();
+      redis.expire = jest.fn();
       const result = await service.login(body);
       jwtService.sign(
         {
@@ -121,11 +130,11 @@ describe('UsersService', () => {
       };
       expect(result).toBe(result);
       expect(logsService.saveLog).toBeCalledWith(user.userIndex, saveLog);
-      expect(service.redis.set).toBeCalledWith(user.userIndex, '');
-      expect(service.redis.expire).toBeCalledWith(
-        user.userIndex,
-        1000 * 60 * 60 * 24,
-      );
+      expect(redis.set).toBeCalledWith({ name: user.userIndex, content: '' });
+      expect(redis.expire).toBeCalledWith({
+        name: user.userIndex,
+        time: 1000 * 60 * 60 * 24,
+      });
     });
   });
 

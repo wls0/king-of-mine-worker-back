@@ -7,9 +7,14 @@ import { UsersService } from './users.service';
 import { Items } from '../model/items.model';
 import { GameRecords } from '../model/game-records.model';
 import { LogsModule } from '../logs/logs.module';
+import { RedisModule } from '../redis/redis.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Users, Items, GameRecords]), LogsModule],
+  imports: [
+    TypeOrmModule.forFeature([Users, Items, GameRecords]),
+    LogsModule,
+    RedisModule,
+  ],
   controllers: [UsersController],
   providers: [UsersService, UsersRepository],
 })

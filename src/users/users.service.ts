@@ -10,16 +10,15 @@ import { passwordMaker, passwordDecoding } from './utils/util';
 import { LogsService } from '../logs/logs.service';
 import { SaveLogDto } from '../logs/dto/logs.dto';
 import { jwtPayload } from '../auth/jwt.payload';
-import Redis from 'ioredis';
+import { RedisService } from '../redis/redis.service';
 @Injectable()
 export class UsersService {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly jwtService: JwtService,
     private readonly logService: LogsService,
+    private readonly redis: RedisService,
   ) {}
-
-  redis: Redis = new Redis(process.env.REDIS);
   async findId(param: UserIdDto) {
     const { id } = param;
     const user = await this.usersRepository.findUser(id);
@@ -70,8 +69,11 @@ export class UsersService {
         };
 
         await this.logService.saveLog(user.userIndex, saveLog);
-        await this.redis.set(user.userIndex, '');
-        await this.redis.expire(user.userIndex, 1000 * 60 * 60 * 24);
+        await this.redis.set({ name: user.userIndex, content: '' });
+        await this.redis.expire({
+          name: user.userIndex,
+          time: 1000 * 60 * 60 * 24,
+        });
         return token;
       } else {
         throw new UnauthorizedException();
