@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  OnApplicationBootstrap,
+} from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { CompaniesRepository } from '../companies/companies.repository';
 import { GamesRepository } from '../games/games.repository';
@@ -12,12 +16,19 @@ import {
 import { ManagesRepository } from './manages.repository';
 
 @Injectable()
-export class ManagesService {
+export class ManagesService implements OnApplicationBootstrap {
   constructor(
     private readonly managesRepository: ManagesRepository,
     private readonly gamesRepository: GamesRepository,
     private readonly companiesRepository: CompaniesRepository,
   ) {}
+
+  async onApplicationBootstrap() {
+    const manager = await this.managesRepository.managerFind();
+    if (!manager) {
+      await this.managesRepository.managerCraete();
+    }
+  }
 
   //스테이지 정보 확인
   async findStageInfo(param: GameInfoDTO) {

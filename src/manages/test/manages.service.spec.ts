@@ -189,4 +189,21 @@ describe('ManagesService', () => {
       expect(managesRepository.deleteRank).toBeCalled();
     });
   });
+  describe('onApplicationBootstrap', () => {
+    it('관리자 계정이 없을 때', async () => {
+      managesRepository.managerFind = jest.fn().mockReturnValue(null);
+      await service.onApplicationBootstrap();
+      expect(managesRepository.managerCraete).toBeCalled();
+    });
+
+    it('관리자 계정이 있을 때', async () => {
+      managesRepository.managerFind = jest.fn().mockReturnValue({
+        id: 'manager',
+        password: '123sdasd',
+        salt: 'sdfjls;kdfj',
+      });
+      await service.onApplicationBootstrap();
+      expect(managesRepository.managerCraete).not.toBeCalled();
+    });
+  });
 });

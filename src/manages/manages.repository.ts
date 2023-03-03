@@ -13,6 +13,7 @@ import { GamesService } from '../games/games.service';
 import { UseGoldDTO } from '../games/dto/games.dto';
 import dayjs from 'dayjs';
 import { RedisService } from '../redis/redis.service';
+import { passwordMaker } from '../users/utils/util';
 @Injectable()
 export class ManagesRepository {
   constructor(
@@ -146,5 +147,24 @@ export class ManagesRepository {
       this.communitiesRepository.sendGift('manager', sendGift),
       this.gamesService.useGold(user, useGold),
     ]);
+  }
+
+  async managerFind() {
+    return await this.usersRepository.findOne({
+      where: { id: process.env.MANAGER_ID },
+    });
+  }
+
+  async managerCraete() {
+    const { makePassword, salt } = passwordMaker(process.env.MANAGER_PWD);
+    await this.usersRepository
+      .createQueryBuilder('users')
+      .insert()
+      .values({
+        id: process.env.MANAGER_ID,
+        password: makePassword,
+        salt,
+      })
+      .execute();
   }
 }
