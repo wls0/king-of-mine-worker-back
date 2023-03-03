@@ -8,6 +8,6 @@ export class LogsController {
 
   @Get('/:type/:startDate/:endDate')
   async findLog(@Param() param: FindLogDto) {
-    await this.logsService.findLog(param);
+    return await this.logsService.findLog(param);
   }
 }
