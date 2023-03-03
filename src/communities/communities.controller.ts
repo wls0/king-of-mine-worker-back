@@ -1,10 +1,12 @@
-import { Controller, Get, Body, Patch, Post } from '@nestjs/common';
+import { Controller, Get, Body, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt.guard';
 import { jwtPayload } from '../auth/jwt.payload';
 import { CurrentUser } from '../common/decorators/user.decorators';
 import { CommunitiesService } from './communities.service';
 import { ReceiveGoldDTO, SendGoldDTO } from './dto/communities.dto';
 
+@UseGuards(JwtAuthGuard)
 @Controller('communities')
 @ApiTags('communities')
 export class CommunitiesController {
