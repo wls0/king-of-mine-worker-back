@@ -13,6 +13,7 @@ import {
   GameInfoDTO,
   GameStageDTO,
   UpdateGameStageDTO,
+  UserMainDto,
   UserSelectDTO,
   UserStatusSettingDTO,
 } from './dto/manages.dto';
@@ -58,5 +59,11 @@ export class ManagesController {
   @ApiOperation({ summary: '유저 삭제' })
   async deleteUser(@Param() param: UserSelectDTO) {
     return await this.managesService.deleteUser(param);
+  }
+
+  @Post('login')
+  @ApiOperation({ summary: '관리자 로그인' })
+  async managerLogin(@Param() param: UserMainDto) {
+    return await this.managesService.managerLogin(param);
   }
 }

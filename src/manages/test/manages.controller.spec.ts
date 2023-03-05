@@ -89,4 +89,15 @@ describe('ManagesController', () => {
       expect(managesService.deleteUser).toBeCalledWith(body);
     });
   });
+
+  describe('managerLogin', () => {
+    const body = {
+      id: '관리자',
+      password: '1234',
+    };
+    it('managerService.managerLogin', async () => {
+      await controller.managerLogin(body);
+      expect(managesService.managerLogin).toBeCalledWith(body);
+    });
+  });
 });

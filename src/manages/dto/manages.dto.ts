@@ -31,3 +31,4 @@ export class UserStatusSettingDTO extends UserSelectDTO {
   @IsBoolean()
   status: boolean;
 }
+export class UserMainDto extends PickType(Users, ['id', 'password'] as const) {}

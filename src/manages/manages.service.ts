@@ -10,6 +10,7 @@ import {
   GameInfoDTO,
   GameStageDTO,
   UpdateGameStageDTO,
+  UserMainDto,
   UserSelectDTO,
   UserStatusSettingDTO,
 } from './dto/manages.dto';
@@ -122,4 +123,5 @@ export class ManagesService implements OnApplicationBootstrap {
     }
     await this.managesRepository.deleteRank();
   }
+  async managerLogin(body: UserMainDto) {}
 }
