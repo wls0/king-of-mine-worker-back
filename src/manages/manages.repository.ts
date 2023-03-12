@@ -164,6 +164,7 @@ export class ManagesRepository {
         id: process.env.MANAGER_ID,
         password: makePassword,
         salt,
+        accessLevel: false,
       })
       .execute();
   }
