@@ -3,7 +3,10 @@ import {
   NotFoundException,
   OnApplicationBootstrap,
 } from '@nestjs/common';
+import { UnauthorizedException } from '@nestjs/common/exceptions';
+import { JwtService } from '@nestjs/jwt';
 import { Cron } from '@nestjs/schedule';
+import { passwordDecoding } from '../users/utils/util';
 import { CompaniesRepository } from '../companies/companies.repository';
 import { GamesRepository } from '../games/games.repository';
 import {
@@ -22,6 +25,7 @@ export class ManagesService implements OnApplicationBootstrap {
     private readonly managesRepository: ManagesRepository,
     private readonly gamesRepository: GamesRepository,
     private readonly companiesRepository: CompaniesRepository,
+    private readonly jwtService: JwtService,
   ) {}
 
   async onApplicationBootstrap() {
@@ -123,5 +127,29 @@ export class ManagesService implements OnApplicationBootstrap {
     }
     await this.managesRepository.deleteRank();
   }
-  async managerLogin(body: UserMainDto) {}
+  async managerLogin(body: UserMainDto) {
+    const { id, password } = body;
+    const manager = await this.managesRepository.managerFind();
+
+    if (!manager) {
+      throw new UnauthorizedException();
+    }
+    const passwordCheck = passwordDecoding({
+      password: password,
+      salt: manager.salt,
+    });
+
+    if (id !== manager.id || manager.password !== passwordCheck) {
+      throw new UnauthorizedException();
+    }
+    const token = this.jwtService.sign(
+      {
+        userIndex: manager.userIndex,
+        status: manager.status,
+        accessLevel: manager.accessLevel,
+      },
+      { secret: process.env.JWT },
+    );
+    return token;
+  }
 }

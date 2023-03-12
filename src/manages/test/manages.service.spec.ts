@@ -1,17 +1,22 @@
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ManagesRepository } from '../manages.repository';
 import { ManagesService } from '../manages.service';
 import { GamesRepository } from '../../games/games.repository';
 import { CompaniesRepository } from '../../companies/companies.repository';
+import { passwordMaker } from '../../users/utils/util';
+import { JwtService } from '@nestjs/jwt';
 jest.mock('../../games/games.repository.ts');
 jest.mock('../../companies/companies.repository.ts');
 jest.mock('../manages.repository.ts');
+process.env.CRYPTO = process.env.CRYPTO;
+process.env.JWT = process.env.JWT;
 describe('ManagesService', () => {
   let service: ManagesService;
   let managesRepository: ManagesRepository;
   let gamesRepository: GamesRepository;
   let companiesRepository: CompaniesRepository;
+  let jwtService: JwtService;
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -19,9 +24,10 @@ describe('ManagesService', () => {
         ManagesRepository,
         GamesRepository,
         CompaniesRepository,
+        JwtService,
       ],
     }).compile();
-
+    jwtService = new JwtService();
     service = module.get<ManagesService>(ManagesService);
     managesRepository = module.get<ManagesRepository>(ManagesRepository);
     gamesRepository = module.get<GamesRepository>(GamesRepository);
@@ -204,6 +210,60 @@ describe('ManagesService', () => {
       });
       await service.onApplicationBootstrap();
       expect(managesRepository.managerCraete).not.toBeCalled();
+    });
+  });
+  describe('managerLogin', () => {
+    it('아이디가 틀렸을 때', async () => {
+      const body = {
+        id: 'manager1',
+        password: '1234',
+      };
+      managesRepository.managerFind = jest.fn().mockReturnValue(null);
+      await expect(async () => {
+        await service.managerLogin(body);
+      }).rejects.toThrowError(new UnauthorizedException());
+    });
+    it('비밀번호가 틀렸을 때', async () => {
+      const body = {
+        id: process.env.MANAGER_ID,
+        password: '1234',
+      };
+      managesRepository.managerFind = jest.fn().mockReturnValue({
+        id: process.env.MANAGER_ID,
+        password: '1234',
+        salt: '1234',
+      });
+      await expect(async () => {
+        await service.managerLogin(body);
+      }).rejects.toThrowError(new UnauthorizedException());
+    });
+    it('정상 작동', async () => {
+      const id = process.env.MANAGER_ID;
+      const password = process.env.MANAGER_PWD;
+      const body = {
+        id,
+        password,
+      };
+      const { makePassword, salt } = passwordMaker(password);
+      const manager = {
+        userIndex: '123432index',
+        id,
+        password: makePassword,
+        salt,
+        status: true,
+        accessLevel: false,
+      };
+      managesRepository.managerFind = jest.fn().mockReturnValue(manager);
+      const token = jwtService.sign(
+        {
+          userIndex: manager.userIndex,
+          status: manager.status,
+          accessLevel: manager.accessLevel,
+        },
+        { secret: process.env.JWT },
+      );
+      const result = await service.managerLogin(body);
+      expect(result).toBe(token);
     });
   });
 });

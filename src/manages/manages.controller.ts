@@ -63,7 +63,7 @@ export class ManagesController {
 
   @Post('login')
   @ApiOperation({ summary: '관리자 로그인' })
-  async managerLogin(@Param() param: UserMainDto) {
+  async managerLogin(@Body() param: UserMainDto) {
     return await this.managesService.managerLogin(param);
   }
 }
